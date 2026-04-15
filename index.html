@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Control Risks | OFP Tracker</title>
-    <!-- Bootstrap & Fonts -->
+    <!-- Bootstrap -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" id="bootstrap-rtl">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -112,10 +112,12 @@
                             <thead class="table-dark">
                                 <tr>
                                     <th>Ref</th>
-                                    <th style="width: 30%;">اسم الكتاب والتفاصيل</th>
+                                    <th style="width: 25%;">اسم الكتاب وتفاصيل القوائم</th>
                                     <th>الهيئة / النوع</th>
                                     <th>المذكرة <i class="fa fa-paperclip"></i></th>
-                                    <th>إرسال</th><th>استلام</th><th>الحالة</th><th>الإجراء</th>
+                                    <th>إرسال</th><th>استلام</th>
+                                    <th>بواسطة</th>
+                                    <th>الحالة</th><th>الإجراء</th>
                                 </tr>
                             </thead>
                             <tbody id="auth-table-body"></tbody>
@@ -148,9 +150,12 @@
                             <thead class="table-success">
                                 <tr>
                                     <th>Ref / OFP</th>
-                                    <th style="width: 30%;">التصريح الجديد والتفاصيل</th>
+                                    <th style="width: 25%;">التصريح الجديد والتفاصيل</th>
+                                    <th>الهيئة / النوع</th>
                                     <th>المذكرة <i class="fa fa-paperclip"></i></th>
-                                    <th>إرسال</th><th>استلام</th><th>الحالة</th><th>إجراء</th>
+                                    <th>إرسال</th><th>استلام</th>
+                                    <th>بواسطة</th>
+                                    <th>الحالة</th><th>إجراء</th>
                                 </tr>
                             </thead>
                             <tbody id="permits-table-body"></tbody>
@@ -317,7 +322,7 @@
                 id: id ? parseInt(id) : Date.now(), bn_orig: document.getElementById('f-bn').value, pt: document.getElementById('f-pt').value,
                 ta: document.getElementById('f-ta').value, memo: document.getElementById('f-memo').value, ofp: document.getElementById('f-ofp').value,
                 sd: document.getElementById('f-sd').value, rd: document.getElementById('f-rd').value, w: getL('f-w'), e: getL('f-e'), l: getL('f-l'), wp: getL('f-wp'),
-                creator: ex ? ex.creator : currentUser.u, sysRef: ex ? ex.sysRef : `REF-${Math.floor(1000 + Math.random() * 9000)}`, fileData: fileData
+                creator: ex ? ex.creator : currentUser.u, status: 'Pending', sysRef: ex ? ex.sysRef : `REF-${Math.floor(1000 + Math.random() * 9000)}`, fileData: fileData
             };
 
             const countStr = `${entry.e.length} أجانب - ${entry.w.length} عجلات - ${entry.l.length} عراقيين وفقط`;
@@ -417,6 +422,7 @@
                     <td><span class="badge bg-secondary mb-1">${i.ta}</span><br><small class="text-muted">${i.pt}</small></td>
                     <td>${i.memo || '-'}${fileIcon}</td>
                     <td>${i.sd || '-'}</td><td>${i.rd || '-'}</td>
+                    <td>${i.creator}</td>
                     <td>${statusBadge}</td>
                     <td><div class="btn-group"><button class="btn btn-sm btn-outline-dark" onclick="openModal('auth', ${i.id})"><i class="fa fa-edit"></i></button>
                     <button class="btn btn-sm btn-outline-danger" onclick="deleteRecord('auth', ${i.id})"><i class="fa fa-trash"></i></button></div></td>
@@ -448,8 +454,11 @@
                 pb.innerHTML += `<tr>
                     <td><span class="badge bg-secondary">${i.sysRef}</span><br><span class="text-primary fw-bold small">${i.ofp || 'No OFP'}</span></td>
                     <td class="text-start"><span class="fw-bold">${i.bn}</span>${generateNamesPreview(i)}</td>
+                    <td><span class="badge bg-secondary mb-1">${i.ta}</span><br><small class="text-muted">${i.pt}</small></td>
                     <td>${i.memo || '-'}${fileIcon}</td>
-                    <td>${i.sd || '-'}</td><td>${i.rd || '-'}</td><td>${s}</td>
+                    <td>${i.sd || '-'}</td><td>${i.rd || '-'}</td>
+                    <td>${i.creator}</td>
+                    <td>${s}</td>
                     <td><div class="btn-group"><button class="btn btn-sm btn-outline-dark" onclick="openModal('permits', ${i.id})"><i class="fa fa-edit"></i></button>
                     <button class="btn btn-sm btn-outline-danger" onclick="deleteRecord('permits', ${i.id})"><i class="fa fa-trash"></i></button></div></td>
                 </tr>`;
