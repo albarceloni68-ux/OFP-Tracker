@@ -4,68 +4,73 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Control Risks | OFP Tracker</title>
-    <!-- Bootstrap -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" id="bootstrap-rtl">
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <!-- CSS Dependencies -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- SheetJS للتصدير -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <style>
-        :root { --cr-olive: #3D4928; --cr-olive-light: #556B2F; --cr-dark: #1a1a1a; --cr-light: #f4f7f1; }
-        body { font-family: 'Cairo', sans-serif; background-color: var(--cr-light); margin: 0; transition: all 0.3s ease; }
+        :root { 
+            --cr-olive: #3D4928; --cr-olive-light: #556B2F; 
+            --cr-dark: #1a1a1a; --cr-light: #f8f9fa; 
+        }
+        body { font-family: 'Cairo', sans-serif; background-color: var(--cr-light); margin: 0; color: #333; }
         
+        /* Sidebar */
         #sidebar { width: 260px; background-color: var(--cr-dark); color: white; position: fixed; height: 100%; z-index: 1000; transition: 0.3s; }
-        .sidebar-header { background: var(--cr-olive); padding: 30px 15px; text-align: center; border-bottom: 2px solid rgba(255,255,255,0.1); }
-        .sidebar-header h5 { color: white; margin: 0; font-weight: bold; letter-spacing: 1px; }
+        .sidebar-header { background: var(--cr-olive); padding: 25px 15px; text-align: center; border-bottom: 2px solid rgba(255,255,255,0.1); }
         #sidebar ul { list-style: none; padding: 0; margin-top: 10px; }
-        #sidebar ul li a { padding: 15px 20px; display: block; color: #cbd5e0; text-decoration: none; border-bottom: 1px solid #2d3748; cursor: pointer; transition: 0.3s; }
-        #sidebar ul li a:hover, #sidebar ul li a.active { background: var(--cr-olive); color: white; padding-right: 30px; }
+        #sidebar ul li a { padding: 15px 20px; display: block; color: #adb5bd; text-decoration: none; border-bottom: 1px solid #2d3748; cursor: pointer; transition: 0.3s; border-right: 4px solid transparent; }
+        #sidebar ul li a:hover, #sidebar ul li a.active { background: var(--cr-olive-light); color: white; border-right: 4px solid white; padding-right: 25px; }
         
-        .content { margin-right: 260px; min-height: 100vh; transition: 0.3s; }
-        .top-navbar { background: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        /* Layout */
+        .content { margin-right: 260px; min-height: 100vh; transition: 0.3s; padding: 0; }
+        .top-navbar { background: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
         
-        .btn-cr { background-color: var(--cr-olive); color: white; border: none; transition: 0.3s; }
-        .btn-cr:hover { background-color: var(--cr-olive-light); transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.2); color: white; }
+        /* UI Elements */
+        .btn-cr { background-color: var(--cr-olive); color: white; border: none; font-weight: bold; transition: 0.3s; }
+        .btn-cr:hover { background-color: var(--cr-olive-light); transform: translateY(-1px); color: white; }
+        .custom-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .filter-box { background: white; padding: 15px; border-radius: 10px; border: 1px solid #eee; margin-bottom: 15px; }
+        .filter-label { font-size: 0.75rem; font-weight: bold; color: #666; margin-bottom: 3px; display: block; }
+
+        /* Names Box */
+        .names-display { font-size: 0.8rem; background: #fafafa; border: 1px solid #eee; padding: 8px; border-radius: 6px; margin-top: 5px; max-height: 80px; overflow-y: auto; text-align: right; }
+        .ref-badge { font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; background: #f0f4e8; color: var(--cr-olive); border: 1px solid var(--cr-olive); font-weight: bold; }
+
+        /* Login */
+        #login-page { height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--cr-dark) 0%, var(--cr-olive) 100%); position: fixed; width: 100%; top:0; left:0; z-index: 2000; }
+        .login-card { background: white; padding: 40px; border-radius: 20px; width: 400px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+        .login-card h2 { color: var(--cr-olive); font-weight: 800; margin-bottom: 5px; }
         
-        .custom-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); margin-bottom: 20px; }
-        
-        #login-page { height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--cr-dark) 0%, var(--cr-olive) 100%); position: fixed; width: 100%; z-index: 2000; }
-        .login-card { background: white; padding: 50px; border-radius: 20px; width: 100%; max-width: 450px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
-        .login-card h2 { color: var(--cr-olive); font-weight: bold; margin-bottom: 5px; }
+        /* Tables */
+        .table thead th { background-color: #f1f3f5; color: #495057; font-weight: 700; font-size: 0.85rem; border-bottom: 2px solid #dee2e6; }
         
         .ltr-mode .content { margin-right: 0; margin-left: 260px; }
         .ltr-mode #sidebar { right: auto; left: 0; }
-        .ref-badge { font-size: 0.75rem; padding: 2px 8px; border-radius: 4px; background: #f0f4e8; color: var(--cr-olive); border: 1px solid var(--cr-olive); font-weight: bold; }
-        
-        /* فلاتر مصغرة */
-        .filter-box { background: #f8f9fa; padding: 10px 15px; border-radius: 6px; border: 1px solid #dee2e6; margin-bottom: 15px; }
-        .filter-box .form-control, .filter-box .form-select { font-size: 0.8rem; padding: 4px 8px; height: 32px; }
-        .filter-box .btn { height: 32px; padding: 2px 10px; font-size: 0.85rem; }
-        .filter-label { font-size: 0.75rem; color: #6c757d; margin-bottom: 2px; display: block; font-weight: bold; }
-
-        .names-preview { font-size: 0.75rem; background: #fafafa; border: 1px solid #eee; padding: 8px; border-radius: 6px; margin-top: 8px; max-height: 90px; overflow-y: auto; color: #444; line-height: 1.6; text-align: start; }
-        .names-preview strong { color: var(--cr-olive); }
     </style>
 </head>
 <body class="rtl-mode text-start">
 
     <!-- صفحة تسجيل الدخول -->
     <div id="login-page">
-        <div class="login-card shadow-lg">
+        <div class="login-card">
             <h2>CONTROL RISKS</h2>
             <p class="text-muted mb-4 fw-bold">OFP Application Tracker</p>
+            <div id="login-error" class="alert alert-danger p-2 small" style="display: none;">خطأ في اسم المستخدم أو كلمة المرور</div>
             
-            <div id="login-error" class="alert alert-danger" style="display: none; font-size: 0.9rem;">
-                <i class="fa fa-exclamation-circle"></i> اسم المستخدم أو كلمة المرور غير صحيحة.
+            <!-- أزلنا <form> واستخدمنا <div> لمنع Refresh المتصفح -->
+            <div class="mb-3 text-start">
+                <label class="small fw-bold">اسم المستخدم</label>
+                <input type="text" id="userInput" class="form-control">
             </div>
-
-            <form id="loginForm">
-                <div class="mb-3 text-start"><label>اسم المستخدم</label><input type="text" id="user" class="form-control" required></div>
-                <div class="mb-4 text-start"><label>كلمة المرور</label><input type="password" id="pass" class="form-control" required></div>
-                <button type="submit" class="btn btn-cr w-100 p-2 fw-bold">دخول</button>
-                <div class="mt-3"><a href="#" class="text-muted small text-decoration-none" onclick="alert('يرجى التواصل مع: compad.southiraq@controlrisks.com')">نسيت كلمة السر؟</a></div>
-            </form>
+            <div class="mb-4 text-start">
+                <label class="small fw-bold">كلمة المرور</label>
+                <input type="password" id="passInput" class="form-control" onkeypress="if(event.key === 'Enter') loginSystem()">
+            </div>
+            <button onclick="loginSystem()" class="btn btn-cr w-100 p-2">دخول</button>
+            <div class="mt-3"><a href="#" class="text-muted small text-decoration-none" onclick="alert('compad.southiraq@controlrisks.com')">نسيت كلمة السر؟</a></div>
         </div>
     </div>
 
@@ -73,116 +78,89 @@
     <div id="main-dashboard" style="display: none;">
         <nav id="sidebar">
             <div class="sidebar-header"><h5>CONTROL RISKS</h5></div>
-            <ul>
-                <li><a onclick="showTab('authorities')" id="link-auth" class="active"><i class="fa fa-folder-open ms-2"></i> الطلبات للهيئات</a></li>
-                <li><a onclick="showTab('permits')" id="link-permits"><i class="fa fa-id-card-clip ms-2"></i> التصاريح المستلمة</a></li>
-                <li id="admin-menu" style="display: none;"><a onclick="showTab('users')" id="link-users"><i class="fa fa-users-gear ms-2"></i> إدارة الحسابات</a></li>
-                <li><a onclick="logout()"><i class="fa fa-power-off ms-2"></i> خروج</a></li>
+            <ul id="nav-links">
+                <li><a onclick="showTab('auth')" id="link-auth" class="active"><i class="fa fa-folder ms-2"></i> الطلبات للهيئات</a></li>
+                <li><a onclick="showTab('permits')" id="link-permits"><i class="fa fa-check-circle ms-2"></i> التصاريح المستلمة</a></li>
+                <li id="admin-menu" style="display: none;"><a onclick="showTab('users')" id="link-users"><i class="fa fa-users-cog ms-2"></i> إدارة الحسابات</a></li>
+                <li><a onclick="location.reload()"><i class="fa fa-sign-out-alt ms-2"></i> خروج</a></li>
             </ul>
         </nav>
 
         <div class="content">
             <header class="top-navbar">
-                <div><button class="btn btn-sm btn-outline-secondary" onclick="toggleLanguage()">EN / AR</button></div>
-                <div>مرحباً: <strong id="user-name" class="text-success"></strong></div>
+                <button class="btn btn-sm btn-outline-secondary fw-bold" onclick="toggleLanguage()">EN / AR</button>
+                <div class="fw-bold">مرحباً: <span id="user-display" class="text-success"></span></div>
             </header>
 
             <div class="p-4">
-                <!-- سجل الهيئات -->
-                <div id="authorities-page">
-                    <div class="d-flex justify-content-between mb-2 align-items-center">
-                        <h3 class="fw-bold">سجل الطلبات للهيئات</h3>
-                        <button class="btn btn-cr shadow-sm px-4" onclick="openModal('auth')"><i class="fa fa-plus-circle me-1"></i> إضافة طلب</button>
+                <!-- قسم الهيئات -->
+                <div id="auth-section">
+                    <div class="d-flex justify-content-between mb-3 align-items-center">
+                        <h3 class="fw-bold m-0">الطلبات للهيئات</h3>
+                        <button class="btn btn-cr px-4" onclick="openModal('auth')"><i class="fa fa-plus me-1"></i> إضافة طلب</button>
                     </div>
-                    
+
+                    <!-- الفلاتر -->
                     <div class="filter-box row g-2 align-items-end">
-                        <div class="col-md-3"><span class="filter-label">البحث (الاسم / المذكرة)</span><input type="text" id="f-auth-name" class="form-control" placeholder="ابحث هنا..." onkeyup="render()"></div>
-                        <div class="col-md-2"><span class="filter-label">من تاريخ</span><input type="date" id="f-auth-date-from" class="form-control" onchange="render()"></div>
-                        <div class="col-md-2"><span class="filter-label">إلى تاريخ</span><input type="date" id="f-auth-date-to" class="form-control" onchange="render()"></div>
-                        <div class="col-md-2"><span class="filter-label">الحالة</span>
-                            <select id="f-auth-status" class="form-select" onchange="render()">
-                                <option value="">الكل</option><option value="Pending">Pending (معلق)</option><option value="Done">Completed (مكتمل)</option>
-                            </select>
-                        </div>
-                        <div class="col-md-1"><button class="btn btn-secondary w-100" onclick="clearFilters('auth')" title="مسح الفلاتر"><i class="fa fa-sync"></i></button></div>
+                        <div class="col-md-2"><label class="filter-label">رقم الكتاب</label><input type="text" id="filter-auth-bn" class="form-control" placeholder="بحث..." onkeyup="render()"></div>
+                        <div class="col-md-3"><label class="filter-label">البحث في الأسماء/القوائم</label><input type="text" id="filter-auth-list" class="form-control" placeholder="اسم، سلاح، عجلة..." onkeyup="render()"></div>
+                        <div class="col-md-2"><label class="filter-label">من تاريخ</label><input type="date" id="filter-auth-from" class="form-control" onchange="render()"></div>
+                        <div class="col-md-2"><label class="filter-label">إلى تاريخ</label><input type="date" id="filter-auth-to" class="form-control" onchange="render()"></div>
+                        <div class="col-md-2"><label class="filter-label">الحالة</label><select id="filter-auth-status" class="form-select" onchange="render()"><option value="">الكل</option><option value="Pending">Pending</option><option value="Done">Completed</option></select></div>
+                        <div class="col-md-1"><button class="btn btn-secondary w-100" onclick="resetFilters('auth')"><i class="fa fa-sync"></i></button></div>
                     </div>
 
                     <div class="custom-card table-responsive">
                         <table class="table table-hover align-middle border text-center">
-                            <thead class="table-dark">
+                            <thead>
                                 <tr>
-                                    <th>Ref</th>
-                                    <th style="width: 25%;">اسم الكتاب وتفاصيل القوائم</th>
-                                    <th>الهيئة / النوع</th>
-                                    <th>المذكرة <i class="fa fa-paperclip"></i></th>
-                                    <th>إرسال</th>
-                                    <th>استلام</th>
-                                    <th>بواسطة</th>
-                                    <th>الحالة</th>
-                                    <th>الإجراء</th>
+                                    <th>Ref</th><th style="width: 30%;">الكتاب والأسماء</th><th>الهيئة/النوع</th><th>المذكرة</th><th>إرسال</th><th>استلام</th><th>بواسطة</th><th>الحالة</th><th>إجراء</th>
                                 </tr>
                             </thead>
-                            <tbody id="auth-table-body"></tbody>
+                            <tbody id="auth-body"></tbody>
                         </table>
-                        <div class="mt-3 text-end">
-                            <button class="btn btn-success btn-sm" onclick="exportData('auth', 'excel')"><i class="fa fa-file-excel"></i> Excel</button>
-                            <button class="btn btn-secondary btn-sm" onclick="exportData('auth', 'csv')"><i class="fa fa-file-csv"></i> CSV</button>
-                        </div>
+                        <div class="mt-3"><button class="btn btn-success btn-sm" onclick="exportData('auth')">تصدير Excel</button></div>
                     </div>
                 </div>
 
-                <!-- سجل التصاريح -->
-                <div id="permits-page" style="display: none;">
-                    <h3 class="fw-bold mb-2" style="color: var(--cr-olive);">سجل التصاريح المستلمة</h3>
-                    
+                <!-- قسم التصاريح -->
+                <div id="permits-section" style="display: none;">
+                    <h3 class="fw-bold mb-3" style="color: var(--cr-olive);">التصاريح المستلمة</h3>
+                    <!-- فلاتر التصاريح -->
                     <div class="filter-box row g-2 align-items-end">
-                        <div class="col-md-3"><span class="filter-label">البحث (الاسم / OFP / المذكرة)</span><input type="text" id="f-perm-name" class="form-control" placeholder="ابحث هنا..." onkeyup="render()"></div>
-                        <div class="col-md-2"><span class="filter-label">من تاريخ</span><input type="date" id="f-perm-date-from" class="form-control" onchange="render()"></div>
-                        <div class="col-md-2"><span class="filter-label">إلى تاريخ</span><input type="date" id="f-perm-date-to" class="form-control" onchange="render()"></div>
-                        <div class="col-md-2"><span class="filter-label">الحالة</span>
-                            <select id="f-perm-status" class="form-select" onchange="render()">
-                                <option value="">الكل</option><option value="Pending">Pending</option><option value="Completed">Completed</option>
-                            </select>
-                        </div>
-                        <div class="col-md-1"><button class="btn btn-secondary w-100" onclick="clearFilters('perm')" title="مسح الفلاتر"><i class="fa fa-sync"></i></button></div>
+                        <div class="col-md-2"><label class="filter-label">رقم الكتاب</label><input type="text" id="filter-perm-bn" class="form-control" onkeyup="render()"></div>
+                        <div class="col-md-2"><label class="filter-label">OFP / Ref</label><input type="text" id="filter-perm-ofp" class="form-control" onkeyup="render()"></div>
+                        <div class="col-md-3"><label class="filter-label">بحث في الأسماء</label><input type="text" id="filter-perm-list" class="form-control" onkeyup="render()"></div>
+                        <div class="col-md-2"><label class="filter-label">من تاريخ</label><input type="date" id="filter-perm-from" class="form-control" onchange="render()"></div>
+                        <div class="col-md-2"><label class="filter-label">إلى تاريخ</label><input type="date" id="filter-perm-to" class="form-control" onchange="render()"></div>
+                        <div class="col-md-1"><button class="btn btn-secondary w-100" onclick="resetFilters('perm')"><i class="fa fa-sync"></i></button></div>
                     </div>
 
                     <div class="custom-card table-responsive">
                         <table class="table table-bordered align-middle border text-center">
-                            <thead class="table-success">
+                            <thead class="table-success text-dark">
                                 <tr>
-                                    <th>Ref / OFP</th>
-                                    <th style="width: 25%;">التصريح الجديد والتفاصيل</th>
-                                    <th>الهيئة / النوع</th>
-                                    <th>المذكرة <i class="fa fa-paperclip"></i></th>
-                                    <th>إرسال</th>
-                                    <th>استلام</th>
-                                    <th>بواسطة</th>
-                                    <th>الحالة</th>
-                                    <th>إجراء</th>
+                                    <th>Ref / OFP</th><th style="width: 30%;">كتاب التصريح والأسماء</th><th>الهيئة/النوع</th><th>المذكرة</th><th>إرسال</th><th>استلام</th><th>بواسطة</th><th>الحالة</th><th>إجراء</th>
                                 </tr>
                             </thead>
-                            <tbody id="permits-table-body"></tbody>
+                            <tbody id="perm-body"></tbody>
                         </table>
-                        <div class="mt-3 text-end">
-                            <button class="btn btn-success btn-sm" onclick="exportData('permits', 'excel')"><i class="fa fa-file-excel"></i> Excel</button>
-                            <button class="btn btn-secondary btn-sm" onclick="exportData('permits', 'csv')"><i class="fa fa-file-csv"></i> CSV</button>
-                        </div>
+                        <div class="mt-3"><button class="btn btn-success btn-sm" onclick="exportData('perm')">تصدير Excel</button></div>
                     </div>
                 </div>
 
-                <!-- إدارة الحسابات -->
-                <div id="users-page" style="display: none;">
+                <!-- قسم الحسابات -->
+                <div id="users-section" style="display: none;">
                     <h3 class="fw-bold mb-4">إدارة الحسابات</h3>
                     <div class="custom-card">
-                        <div class="row g-3 mb-4 text-start">
-                            <input type="hidden" id="edit-user-index" value="-1">
-                            <div class="col-md-4"><label>اسم المستخدم</label><input id="nu" class="form-control"></div>
-                            <div class="col-md-4"><label>الباسورد</label><input id="np" class="form-control"></div>
-                            <div class="col-md-4 d-flex align-items-end"><button id="btn-save-user" class="btn btn-success w-100 fw-bold" onclick="addUser()">إضافة حساب</button></div>
+                        <div class="row g-2 mb-4">
+                            <input type="hidden" id="edit-user-idx" value="-1">
+                            <div class="col-md-4"><label class="small fw-bold">اسم المستخدم</label><input id="nu" class="form-control"></div>
+                            <div class="col-md-4"><label class="small fw-bold">كلمة المرور</label><input id="np" class="form-control"></div>
+                            <div class="col-md-4 d-flex align-items-end"><button id="btn-save-user" class="btn btn-cr w-100 fw-bold" onclick="handleUser()">حفظ الحساب</button></div>
                         </div>
-                        <table class="table table-striped table-bordered text-center">
-                            <thead class="table-dark"><tr><th>المستخدم</th><th>الباسورد</th><th>الرتبة</th><th>الإجراءات</th></tr></thead>
+                        <table class="table table-striped border text-center">
+                            <thead class="table-dark"><tr><th>المستخدم</th><th>الباسورد</th><th>الرتبة</th><th>الإجراء</th></tr></thead>
                             <tbody id="utb"></tbody>
                         </table>
                     </div>
@@ -191,366 +169,287 @@
         </div>
     </div>
 
-    <!-- Modal Form -->
+    <!-- Modal الموحد -->
     <div class="modal fade" id="mainModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-xl">
             <div class="modal-content text-start">
-                <div class="modal-header bg-dark text-white"><h5 class="modal-title">بيانات الطلب</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
-                <div class="modal-body">
-                    <form id="orderForm">
-                        <input type="hidden" id="edit-id"><input type="hidden" id="form-type">
-                        <div class="row g-3">
-                            <div class="col-md-3"><label>رقم الكتاب</label><input type="text" id="f-bn" class="form-control" required></div>
-                            <div class="col-md-3"><label>نوع التصريح</label><select id="f-pt" class="form-select"><option value="مؤقت">مؤقت</option><option value="دائمي">دائمي</option></select></div>
-                            <div class="col-md-3"><label>الهيئة</label><select id="f-ta" class="form-select"><option value="BGC">BGC</option><option value="ROO">ROO</option><option value="SRC">SRC</option></select></div>
-                            <div class="col-md-3" id="ofp-container"><label>OFP Number</label><input type="text" id="f-ofp" class="form-control"></div>
-                            
-                            <div class="col-md-3"><label>تاريخ الإرسال</label><input type="date" id="f-sd" class="form-control"></div>
-                            <div class="col-md-3"><label>تاريخ الاستلام</label><input type="date" id="f-rd" class="form-control"></div>
-                            <div class="col-md-3"><label>رقم المذكرة</label><input type="text" id="f-memo" class="form-control"></div>
-                            <div class="col-md-3">
-                                <label>مرفق المذكرة (اختياري)</label>
-                                <input type="file" id="f-file" class="form-control" accept=".pdf, image/*">
-                            </div>
-
-                            <div class="col-12"><div class="alert alert-light border small text-center mt-2">انسخ القوائم من الوورد مباشرة في الخانات أدناه</div></div>
-                            <div class="col-md-3"><label>العجلات</label><textarea id="f-w" class="form-control" rows="3"></textarea></div>
-                            <div class="col-md-3"><label>الأجانب</label><textarea id="f-e" class="form-control" rows="3"></textarea></div>
-                            <div class="col-md-3"><label>العراقيين</label><textarea id="f-l" class="form-control" rows="3"></textarea></div>
-                            <div class="col-md-3"><label>الأسلحة</label><textarea id="f-wp" class="form-control" rows="3"></textarea></div>
-                        </div>
-                        <button type="submit" class="btn btn-cr w-100 mt-4 p-2 fw-bold">حفظ البيانات</button>
-                    </form>
+                <!-- أزلنا <form> لمنع Refresh واستبدلناه بـ div -->
+                <div class="modal-header text-white" style="background: var(--cr-olive);">
+                    <h5 class="modal-title fw-bold">بيانات الطلب</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
+                <div class="modal-body">
+                    <input type="hidden" id="form-type"><input type="hidden" id="edit-id">
+                    <div class="row g-3">
+                        <div class="col-md-3"><label class="fw-bold small">رقم الكتاب</label><input type="text" id="f-bn" class="form-control" required></div>
+                        <div class="col-md-3"><label class="fw-bold small">نوع التصريح</label><select id="f-pt" class="form-select"><option value="مؤقت">مؤقت</option><option value="دائمي">دائمي</option></select></div>
+                        <div class="col-md-3"><label class="fw-bold small">الهيئة</label><select id="f-ta" class="form-select"><option value="BGC">BGC</option><option value="ROO">ROO</option><option value="SRC">SRC</option></select></div>
+                        <div class="col-md-3" id="ofp-box"><label class="fw-bold small text-primary">OFP Number</label><input type="text" id="f-ofp" class="form-control"></div>
+                        <div class="col-md-3"><label class="fw-bold small">تاريخ الإرسال</label><input type="date" id="f-sd" class="form-control"></div>
+                        <div class="col-md-3"><label class="fw-bold small">تاريخ الاستلام</label><input type="date" id="f-rd" class="form-control"></div>
+                        <div class="col-md-3"><label class="fw-bold small">رقم المذكرة</label><input type="text" id="f-memo" class="form-control"></div>
+                        <div class="col-md-3"><label class="fw-bold small">مرفق (PDF/Image)</label><input type="file" id="f-file" class="form-control"></div>
+                        
+                        <div class="col-12 mt-3"><div class="alert alert-light border small text-center fw-bold">يمكنك النسخ واللصق مباشرة من الوورد هنا</div></div>
+                        <div class="col-md-3"><label class="small fw-bold">العجلات</label><textarea id="f-w" class="form-control" rows="4"></textarea></div>
+                        <div class="col-md-3"><label class="small fw-bold">الأجانب</label><textarea id="f-e" class="form-control" rows="4"></textarea></div>
+                        <div class="col-md-3"><label class="small fw-bold">العراقيين</label><textarea id="f-l" class="form-control" rows="4"></textarea></div>
+                        <div class="col-md-3"><label class="small fw-bold">الأسلحة</label><textarea id="f-wp" class="form-control" rows="4"></textarea></div>
+                    </div>
+                </div>
+                <div class="modal-footer"><button onclick="saveOrder()" class="btn btn-cr px-5">حفظ وتأكيد</button></div>
             </div>
         </div>
     </div>
 
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        let authoritiesData = JSON.parse(localStorage.getItem('auth_data')) || [];
-        let permitsData = JSON.parse(localStorage.getItem('perm_data')) || [];
-        let users = JSON.parse(localStorage.getItem('users_data')) || [{u: 'admin', p: '1234', r: 'admin'}];
-        
+        // Data Load
+        let authData = JSON.parse(localStorage.getItem('CR_AUTH_DATA')) || [];
+        let permData = JSON.parse(localStorage.getItem('CR_PERM_DATA')) || [];
+        let users = JSON.parse(localStorage.getItem('CR_USER_DATA')) || [{u:'admin', p:'1234', r:'admin'}];
         let currentUser = null;
-        let currentLang = 'ar';
+        let lang = 'ar';
         const modal = new bootstrap.Modal(document.getElementById('mainModal'));
 
-        function saveAll() {
-            localStorage.setItem('auth_data', JSON.stringify(authoritiesData));
-            localStorage.setItem('perm_data', JSON.stringify(permitsData));
-            localStorage.setItem('users_data', JSON.stringify(users));
+        // Save Function
+        function saveToStorage() {
+            try {
+                localStorage.setItem('CR_AUTH_DATA', JSON.stringify(authData));
+                localStorage.setItem('CR_PERM_DATA', JSON.stringify(permData));
+                localStorage.setItem('CR_USER_DATA', JSON.stringify(users));
+            } catch(e) {
+                alert("⚠️ الذاكرة ممتلئة! يرجى حذف بعض الطلبات القديمة أو المرفقات.");
+            }
         }
 
-        function toggleLanguage() {
-            currentLang = currentLang === 'ar' ? 'en' : 'ar';
-            document.getElementById('html-tag').dir = currentLang === 'en' ? 'ltr' : 'rtl';
-            document.getElementById('bootstrap-rtl').href = currentLang === 'en' ? "https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" : "https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css";
-            document.body.className = currentLang === 'en' ? 'ltr-mode text-start' : 'rtl-mode text-start';
-        }
-
-        document.getElementById('loginForm').onsubmit = (e) => {
-            e.preventDefault();
-            const u = document.getElementById('user').value, p = document.getElementById('pass').value;
+        // --- إصلاح تسجيل الدخول ---
+        function loginSystem() {
+            const u = document.getElementById('userInput').value;
+            const p = document.getElementById('passInput').value;
             const f = users.find(x => x.u === u && x.p === p);
+            
             if(f) {
                 currentUser = f;
-                document.getElementById('login-error').style.display = 'none';
                 document.getElementById('login-page').style.display = 'none';
                 document.getElementById('main-dashboard').style.display = 'block';
-                document.getElementById('user-name').innerText = f.u;
+                document.getElementById('user-display').innerText = f.u;
                 if(f.r === 'admin') document.getElementById('admin-menu').style.display = 'block';
                 render();
             } else {
                 document.getElementById('login-error').style.display = 'block';
             }
-        };
+        }
 
         function showTab(t) {
-            ['authorities','permits','users'].forEach(p => document.getElementById(p+'-page').style.display='none');
-            document.getElementById(t+'-page').style.display='block';
+            ['auth','permits','users'].forEach(s => document.getElementById(s+'-section').style.display = 'none');
+            document.getElementById(t+'-section').style.display = 'block';
             document.querySelectorAll('#sidebar a').forEach(a => a.classList.remove('active'));
             document.getElementById('link-'+t).classList.add('active');
         }
 
-        function logout() { location.reload(); }
+        function openModal(type, id = null) {
+            // تفريغ الحقول يدوياً
+            document.getElementById('f-bn').value = ""; document.getElementById('f-pt').value = "مؤقت"; 
+            document.getElementById('f-ta').value = "BGC"; document.getElementById('f-memo').value = ""; 
+            document.getElementById('f-ofp').value = ""; document.getElementById('f-sd').value = ""; 
+            document.getElementById('f-rd').value = ""; document.getElementById('f-w').value = ""; 
+            document.getElementById('f-e').value = ""; document.getElementById('f-l').value = ""; 
+            document.getElementById('f-wp').value = ""; document.getElementById('f-file').value = "";
 
-        function fileToBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = error => reject(error);
-            });
-        }
-
-        async function openModal(type, id = null) {
-            document.getElementById('orderForm').reset();
             document.getElementById('form-type').value = type;
             document.getElementById('edit-id').value = id || "";
-            document.getElementById('ofp-container').style.display = (type === 'permits') ? 'block' : 'none';
-            document.getElementById('f-file').removeAttribute('data-saved-file');
-
+            document.getElementById('ofp-box').style.display = (type === 'permits') ? 'block' : 'none';
+            
             if(id) {
-                const item = (type === 'auth' ? authoritiesData : permitsData).find(i => i.id == id);
-                if(item) {
-                    document.getElementById('f-bn').value = item.bn_orig || "";
-                    document.getElementById('f-pt').value = item.pt || "مؤقت";
-                    document.getElementById('f-ta').value = item.ta || "BGC";
-                    document.getElementById('f-memo').value = item.memo || "";
-                    document.getElementById('f-ofp').value = item.ofp || "";
-                    document.getElementById('f-sd').value = item.sd || "";
-                    document.getElementById('f-rd').value = item.rd || "";
-                    document.getElementById('f-w').value = item.w ? item.w.join('\n') : "";
-                    document.getElementById('f-e').value = item.e ? item.e.join('\n') : "";
-                    document.getElementById('f-l').value = item.l ? item.l.join('\n') : "";
-                    document.getElementById('f-wp').value = item.wp ? item.wp.join('\n') : "";
-                    if(item.fileData) document.getElementById('f-file').setAttribute('data-saved-file', item.fileData);
-                }
+                const item = (type==='auth'?authData:permData).find(x => x.id == id);
+                document.getElementById('f-bn').value = item.bn_orig; document.getElementById('f-pt').value = item.pt;
+                document.getElementById('f-ta').value = item.ta; document.getElementById('f-memo').value = item.memo;
+                document.getElementById('f-ofp').value = item.ofp || ""; document.getElementById('f-sd').value = item.sd;
+                document.getElementById('f-rd').value = item.rd; document.getElementById('f-w').value = item.w.join('\n');
+                document.getElementById('f-e').value = item.e.join('\n'); document.getElementById('f-l').value = item.l.join('\n');
+                document.getElementById('f-wp').value = item.wp.join('\n');
             }
             modal.show();
         }
 
-        document.getElementById('orderForm').onsubmit = async (e) => {
-            e.preventDefault();
-            const type = document.getElementById('form-type').value, id = document.getElementById('edit-id').value;
-            const getL = (eid) => document.getElementById(eid).value.split('\n').filter(l => l.trim() !== "");
-            let ex = id ? (type === 'auth' ? authoritiesData : permitsData).find(i => i.id == id) : null;
+        async function saveOrder() {
+            const bnInput = document.getElementById('f-bn').value;
+            if(!bnInput) return alert("يرجى إدخال رقم الكتاب");
 
+            const type = document.getElementById('form-type').value, id = document.getElementById('edit-id').value;
+            const getL = (id) => document.getElementById(id).value.split('\n').filter(l => l.trim() !== "");
+            
             const fileInput = document.getElementById('f-file');
-            let fileData = fileInput.getAttribute('data-saved-file') || null;
-            if(fileInput.files.length > 0) fileData = await fileToBase64(fileInput.files[0]);
+            let fileBase64 = null;
+            if(fileInput.files.length > 0) {
+                fileBase64 = await new Promise(resolve => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.readAsDataURL(fileInput.files[0]);
+                });
+            }
 
             const entry = {
-                id: id ? parseInt(id) : Date.now(), bn_orig: document.getElementById('f-bn').value, pt: document.getElementById('f-pt').value,
-                ta: document.getElementById('f-ta').value, memo: document.getElementById('f-memo').value, ofp: document.getElementById('f-ofp').value,
-                sd: document.getElementById('f-sd').value, rd: document.getElementById('f-rd').value, w: getL('f-w'), e: getL('f-e'), l: getL('f-l'), wp: getL('f-wp'),
-                creator: ex ? ex.creator : currentUser.u, status: 'Pending', sysRef: ex ? ex.sysRef : `REF-${Math.floor(1000 + Math.random() * 9000)}`, fileData: fileData
+                id: id ? parseInt(id) : Date.now(),
+                bn_orig: bnInput,
+                pt: document.getElementById('f-pt').value,
+                ta: document.getElementById('f-ta').value,
+                memo: document.getElementById('f-memo').value,
+                ofp: document.getElementById('f-ofp').value,
+                sd: document.getElementById('f-sd').value,
+                rd: document.getElementById('f-rd').value,
+                w: getL('f-w'), e: getL('f-e'), l: getL('f-l'), wp: getL('f-wp'),
+                creator: id ? ( (type==='auth'?authData:permData).find(x=>x.id==id).creator ) : currentUser.u,
+                ref: id ? ( (type==='auth'?authData:permData).find(x=>x.id==id).ref ) : 'REF-'+Math.floor(1000+Math.random()*9000),
+                file: fileBase64 || (id ? (type==='auth'?authData:permData).find(x=>x.id==id).file : null)
             };
 
-            const countStr = `${entry.e.length} أجانب - ${entry.w.length} عجلات - ${entry.l.length} عراقيين وفقط`;
-            
+            const stats = `${entry.e.length} أجانب - ${entry.w.length} عجلات - ${entry.l.length} عراقيين`;
+            entry.status = entry.rd ? 'Done' : 'Pending';
+
             if(type === 'auth') {
-                entry.bn = `TEMP - ${entry.bn_orig} - ${entry.pt} - ${countStr}`;
-                entry.status = entry.rd ? 'Done' : 'Pending';
-
+                entry.full_bn = `TEMP - ${entry.bn_orig} - ${entry.pt} - ${stats} وفقط`;
                 if(id) {
-                    authoritiesData[authoritiesData.findIndex(i => i.id == id)] = entry;
-                    let pIdx = permitsData.findIndex(p => p.sysRef === entry.sysRef);
+                    authData[authData.findIndex(x=>x.id == id)] = entry;
+                    const pIdx = permData.findIndex(p => p.ref === entry.ref);
                     if(pIdx !== -1) {
-                        permitsData[pIdx].pt = entry.pt; permitsData[pIdx].ta = entry.ta; permitsData[pIdx].w = entry.w; permitsData[pIdx].e = entry.e; permitsData[pIdx].l = entry.l; permitsData[pIdx].wp = entry.wp;
-                        permitsData[pIdx].bn = `ISCO - ${permitsData[pIdx].bn_orig || ""} - ${entry.pt} - ${countStr}`;
-                        permitsData[pIdx].fileData = entry.fileData;
+                        permData[pIdx].w=entry.w; permData[pIdx].e=entry.e; permData[pIdx].l=entry.l; permData[pIdx].wp=entry.wp;
+                        permData[pIdx].full_bn = `ISCO - ${permData[pIdx].bn_orig} - ${entry.pt} - ${stats} وفقط`;
                     }
-                } else authoritiesData.push(entry);
+                } else authData.push(entry);
 
-                if(entry.status === 'Done') {
-                    const exist = permitsData.find(p => p.sysRef === entry.sysRef);
-                    if(!exist) {
-                        let copy = JSON.parse(JSON.stringify(entry));
-                        copy.id = Date.now() + Math.floor(Math.random() * 100); 
-                        copy.bn_orig = ""; copy.bn = ""; copy.ofp = ""; copy.sd = ""; copy.rd = ""; copy.status = 'Pending';
-                        permitsData.push(copy);
-                    }
+                if(entry.status === 'Done' && !permData.find(p=>p.ref === entry.ref)) {
+                    let copy = JSON.parse(JSON.stringify(entry));
+                    copy.id = Date.now()+1; copy.bn_orig = ""; copy.full_bn = ""; copy.ofp = ""; copy.sd = ""; copy.rd = ""; copy.status = "Pending";
+                    permData.push(copy);
                 }
             } else {
-                entry.status = entry.rd ? 'Completed' : 'Pending'; 
-                entry.bn = `ISCO - ${entry.bn_orig} - ${entry.pt} - ${countStr}`;
-                permitsData[permitsData.findIndex(i => i.id == id)] = entry;
+                entry.status = entry.rd ? 'Completed' : 'Pending';
+                entry.full_bn = `ISCO - ${entry.bn_orig} - ${entry.pt} - ${stats} وفقط`;
+                permData[permData.findIndex(x=>x.id == id)] = entry;
             }
-            saveAll(); render(); modal.hide();
-        };
-
-        function deleteRecord(type, id) {
-            if(confirm("هل أنت متأكد من الحذف نهائياً؟")) {
-                if(type === 'auth') authoritiesData = authoritiesData.filter(i => i.id !== id);
-                else permitsData = permitsData.filter(i => i.id !== id);
-                saveAll(); render();
-            }
-        }
-
-        function clearFilters(type) {
-            if(type === 'auth') {
-                document.getElementById('f-auth-name').value = ''; document.getElementById('f-auth-memo').value = '';
-                document.getElementById('f-auth-date-from').value = ''; document.getElementById('f-auth-date-to').value = ''; document.getElementById('f-auth-status').value = '';
-            } else {
-                document.getElementById('f-perm-name').value = ''; document.getElementById('f-perm-ofp').value = '';
-                document.getElementById('f-perm-memo').value = ''; document.getElementById('f-perm-date-from').value = ''; document.getElementById('f-perm-date-to').value = ''; document.getElementById('f-perm-status').value = '';
-            }
-            render();
-        }
-
-        function openFile(base64Data) {
-            let win = window.open();
-            win.document.write('<iframe src="' + base64Data + '" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>');
-        }
-
-        function generateNamesPreview(item) {
-            let html = '';
-            if(item.w.length > 0 || item.e.length > 0 || item.l.length > 0 || item.wp.length > 0) {
-                html += `<div class="names-preview">`;
-                if(item.w.length > 0) html += `<strong>🚗 العجلات:</strong> ${item.w.join('، ')}<br>`;
-                if(item.e.length > 0) html += `<strong>👤 الأجانب:</strong> ${item.e.join('، ')}<br>`;
-                if(item.l.length > 0) html += `<strong>👨🏽 العراقيين:</strong> ${item.l.join('، ')}<br>`;
-                if(item.wp.length > 0) html += `<strong>🔫 الأسلحة:</strong> ${item.wp.join('، ')}<br>`;
-                html += `</div>`;
-            }
-            return html;
+            saveToStorage(); render(); modal.hide();
         }
 
         function render() {
-            // Filters Auth
-            const fAuthName = document.getElementById('f-auth-name').value.toLowerCase();
-            const fAuthMemo = document.getElementById('f-auth-memo').value.toLowerCase();
-            const fAuthDateFrom = document.getElementById('f-auth-date-from').value;
-            const fAuthDateTo = document.getElementById('f-auth-date-to').value;
-            const fAuthStatus = document.getElementById('f-auth-status').value;
+            // Auth Table
+            const fb = document.getElementById('filter-auth-bn').value.toLowerCase();
+            const fl = document.getElementById('filter-auth-list').value.toLowerCase();
+            const fst = document.getElementById('filter-auth-status').value;
+            const fdf = document.getElementById('filter-auth-from').value;
+            const fdt = document.getElementById('filter-auth-to').value;
 
-            const filteredAuth = authoritiesData.filter(i => {
-                const searchStr = (i.bn + " " + (i.memo||'')).toLowerCase();
-                let dateValid = true;
-                if(fAuthDateFrom || fAuthDateTo) {
-                    const sd = i.sd ? new Date(i.sd) : null; const rd = i.rd ? new Date(i.rd) : null;
-                    const dFrom = fAuthDateFrom ? new Date(fAuthDateFrom) : new Date('1900-01-01');
-                    const dTo = fAuthDateTo ? new Date(fAuthDateTo) : new Date('2100-01-01');
-                    dateValid = (sd && sd >= dFrom && sd <= dTo) || (rd && rd >= dFrom && rd <= dTo);
+            const fAuth = authData.filter(i => {
+                const matchBn = i.bn_orig.toLowerCase().includes(fb);
+                const matchLists = fl === '' || [...i.w, ...i.e, ...i.l, ...i.wp].some(n => n.toLowerCase().includes(fl));
+                const matchStatus = fst === '' || i.status === fst;
+                let matchDate = true;
+                if(fdf || fdt) {
+                    const date = i.sd || i.rd;
+                    if(!date) matchDate = false;
+                    else {
+                        if(fdf && date < fdf) matchDate = false;
+                        if(fdt && date > fdt) matchDate = false;
+                    }
                 }
-                return searchStr.includes(fAuthName) && dateValid && (fAuthStatus ? i.status === fAuthStatus : true);
+                return matchBn && matchLists && matchStatus && matchDate;
             });
 
-            const ab = document.getElementById('auth-table-body'); ab.innerHTML = '';
-            filteredAuth.forEach(i => {
-                const statusBadge = i.status === 'Done' ? '<span class="badge bg-success">Completed</span>' : '<span class="badge bg-warning text-dark">Pending</span>';
-                const fileIcon = i.fileData ? `<a href="#" onclick="openFile('${i.fileData}')" class="text-danger ms-2" title="عرض المرفق"><i class="fa fa-paperclip fa-lg"></i></a>` : '';
-                
+            const ab = document.getElementById('auth-body'); ab.innerHTML = '';
+            fAuth.forEach(i => {
+                const names = `<div class="names-display"><strong>🚗 عجلات:</strong> ${i.w.join(', ')}<br><strong>👤 أجانب:</strong> ${i.e.join(', ')}<br><strong>👨🏽 عراقيين:</strong> ${i.l.join(', ')}</div>`;
+                const fileLink = i.file ? `<a href="${i.file}" target="_blank" class="text-danger ms-1"><i class="fa fa-paperclip"></i></a>` : '';
                 ab.innerHTML += `<tr>
-                    <td><span class="badge bg-secondary shadow-sm">${i.sysRef}</span></td>
-                    <td class="text-start"><span class="fw-bold" style="color: var(--cr-olive);">${i.bn}</span>${generateNamesPreview(i)}</td>
-                    <td><span class="badge bg-dark mb-1">${i.ta}</span><br><small class="text-muted fw-bold">${i.pt}</small></td>
-                    <td class="fw-bold">${i.memo || '-'}${fileIcon}</td>
-                    <td><small>${i.sd || '-'}</small></td>
-                    <td><small>${i.rd || '-'}</small></td>
-                    <td><span class="badge bg-light text-dark border"><i class="fa fa-user me-1"></i> ${i.creator}</span></td>
-                    <td>${statusBadge}</td>
-                    <td>
-                        <div class="btn-group shadow-sm">
-                            <button class="btn btn-sm btn-light border" onclick="openModal('auth', ${i.id})" title="تعديل"><i class="fa fa-edit text-primary"></i></button>
-                            <button class="btn btn-sm btn-light border" onclick="deleteRecord('auth', ${i.id})" title="حذف"><i class="fa fa-trash text-danger"></i></button>
-                        </div>
-                    </td>
-                </tr>`;
+                    <td><span class="ref-badge">${i.ref}</span></td>
+                    <td class="text-start"><strong style="color:var(--cr-olive);">${i.full_bn}</strong>${names}</td>
+                    <td><span class="badge bg-secondary">${i.ta}</span><br><small>${i.pt}</small></td>
+                    <td>${i.memo}${fileLink}</td><td>${i.sd}</td><td>${i.rd}</td><td>${i.creator}</td>
+                    <td><span class="badge ${i.status==='Done'?'bg-success':'bg-warning text-dark'}">${i.status}</span></td>
+                    <td><button class="btn btn-sm btn-outline-dark" onclick="openModal('auth', ${i.id})"><i class="fa fa-edit"></i></button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="deleteRec('auth', ${i.id})"><i class="fa fa-trash"></i></button></td></tr>`;
             });
 
-            // Filters Permits
-            const fPermName = document.getElementById('f-perm-name').value.toLowerCase();
-            const fPermOfp = document.getElementById('f-perm-ofp').value.toLowerCase();
-            const fPermMemo = document.getElementById('f-perm-memo').value.toLowerCase();
-            const fPermDateFrom = document.getElementById('f-perm-date-from').value;
-            const fPermDateTo = document.getElementById('f-perm-date-to').value;
-            const fPermStatus = document.getElementById('f-perm-status').value;
-
-            const filteredPerm = permitsData.filter(i => {
-                const searchStr = (i.bn + " " + (i.ofp||'') + " " + (i.memo||'')).toLowerCase();
-                let dateValid = true;
-                if(fPermDateFrom || fPermDateTo) {
-                    const sd = i.sd ? new Date(i.sd) : null; const rd = i.rd ? new Date(i.rd) : null;
-                    const dFrom = fPermDateFrom ? new Date(fPermDateFrom) : new Date('1900-01-01');
-                    const dTo = fPermDateTo ? new Date(fPermDateTo) : new Date('2100-01-01');
-                    dateValid = (sd && sd >= dFrom && sd <= dTo) || (rd && rd >= dFrom && rd <= dTo);
-                }
-                return searchStr.includes(fPermName) && dateValid && (fPermStatus ? i.status === fPermStatus : true);
+            // Permits Table
+            const pbn = document.getElementById('filter-perm-bn').value.toLowerCase();
+            const pof = document.getElementById('filter-perm-ofp').value.toLowerCase();
+            const pli = document.getElementById('filter-perm-list').value.toLowerCase();
+            
+            const fPerm = permData.filter(i => {
+                return i.bn_orig.toLowerCase().includes(pbn) && 
+                       (i.ofp||'').toLowerCase().includes(pof) &&
+                       (pli === '' || [...i.w, ...i.e, ...i.l, ...i.wp].some(n => n.toLowerCase().includes(pli)));
             });
 
-            const pb = document.getElementById('permits-table-body'); pb.innerHTML = '';
-            filteredPerm.forEach(i => {
-                const s = i.status === 'Completed' ? '<span class="badge bg-success">Completed</span>' : '<span class="badge bg-warning text-dark">Pending</span>';
-                const fileIcon = i.fileData ? `<a href="#" onclick="openFile('${i.fileData}')" class="text-danger ms-2" title="عرض المرفق"><i class="fa fa-paperclip fa-lg"></i></a>` : '';
-
-                pb.innerHTML += `<tr>
-                    <td><span class="badge bg-secondary shadow-sm mb-1">${i.sysRef}</span><br><span class="text-primary fw-bold small">${i.ofp || 'No OFP'}</span></td>
-                    <td class="text-start"><span class="fw-bold" style="color: var(--cr-olive);">${i.bn}</span>${generateNamesPreview(i)}</td>
-                    <td><span class="badge bg-dark mb-1">${i.ta}</span><br><small class="text-muted fw-bold">${i.pt}</small></td>
-                    <td class="fw-bold">${i.memo || '-'}${fileIcon}</td>
-                    <td><small>${i.sd || '-'}</small></td>
-                    <td><small>${i.rd || '-'}</small></td>
-                    <td><span class="badge bg-light text-dark border"><i class="fa fa-user me-1"></i> ${i.creator}</span></td>
-                    <td>${s}</td>
-                    <td>
-                        <div class="btn-group shadow-sm">
-                            <button class="btn btn-sm btn-light border" onclick="openModal('permits', ${i.id})" title="تعديل"><i class="fa fa-edit text-primary"></i></button>
-                            <button class="btn btn-sm btn-light border" onclick="deleteRecord('permits', ${i.id})" title="حذف"><i class="fa fa-trash text-danger"></i></button>
-                        </div>
-                    </td>
-                </tr>`;
-            });
-            renderUsersTable();
-        }
-
-        function renderUsersTable() {
-            const utb = document.getElementById('utb'); utb.innerHTML = '';
-            users.forEach((u, index) => {
-                utb.innerHTML += `<tr>
-                    <td class="fw-bold">${u.u}</td><td>${u.p}</td>
-                    <td><span class="badge ${u.r === 'admin' ? 'bg-danger' : 'bg-primary'}">${u.r}</span></td>
-                    <td>${u.r !== 'admin' ? `
-                        <div class="btn-group">
-                            <button class="btn btn-sm btn-light border" onclick="editUser(${index})" title="تعديل"><i class="fa fa-edit text-warning"></i></button>
-                            <button class="btn btn-sm btn-light border" onclick="deleteUser(${index})" title="حذف"><i class="fa fa-trash text-danger"></i></button>
-                        </div>` : '-'}
-                    </td>
-                </tr>`;
-            });
-        }
-
-        function editUser(index) {
-            document.getElementById('nu').value = users[index].u; document.getElementById('np').value = users[index].p;
-            document.getElementById('edit-user-index').value = index; document.getElementById('btn-save-user').innerHTML = '<i class="fa fa-save me-1"></i> تحديث الحساب';
-        }
-
-        function addUser() {
-            if(currentUser.r !== 'admin') return;
-            const u = document.getElementById('nu').value, p = document.getElementById('np').value;
-            const editIdx = parseInt(document.getElementById('edit-user-index').value);
-
-            if(u && p) {
-                if(editIdx !== -1) { 
-                    users[editIdx].u = u; users[editIdx].p = p; 
-                    document.getElementById('edit-user-index').value = -1; 
-                    document.getElementById('btn-save-user').innerHTML = '<i class="fa fa-plus me-1"></i> إضافة حساب'; 
-                } 
-                else users.push({u, p, r:'user'});
+            const pb = document.getElementById('perm-body'); pb.innerHTML = '';
+            fPerm.forEach(i => {
+                const names = `<div class="names-display"><strong>🚗 عجلات:</strong> ${i.w.join(', ')}<br><strong>👤 أجانب:</strong> ${i.e.join(', ')}<br><strong>👨🏽 عراقيين:</strong> ${i.l.join(', ')}</div>`;
+                const s = i.status === 'Completed' ? 'bg-success' : 'bg-warning text-dark';
+                const fileLink = i.file ? `<a href="${i.file}" target="_blank" class="text-danger ms-1"><i class="fa fa-paperclip"></i></a>` : '';
                 
-                document.getElementById('nu').value=''; document.getElementById('np').value='';
-                saveAll(); renderUsersTable();
-            }
-        }
-
-        function deleteUser(i) { 
-            if(confirm("هل أنت متأكد من حذف الحساب؟")){
-                users.splice(i, 1); saveAll(); renderUsersTable(); 
-            }
-        }
-
-        function exportData(type, format) {
-            let dataToExport = [];
-            let sourceData = type === 'auth' ? authoritiesData : permitsData;
-            let fileName = type === 'auth' ? 'Authorities_Requests' : 'Permits_Received';
-
-            sourceData.forEach(item => {
-                dataToExport.push({
-                    "System Ref": item.sysRef, "Original Book No": item.bn_orig, "Full Book Name": item.bn,
-                    "Authority": item.ta, "Type": item.pt, "Memo No": item.memo || 'N/A', "OFP No": item.ofp || 'N/A', 
-                    "Send Date": item.sd || 'N/A', "Receive Date": item.rd || 'N/A', "Creator": item.creator, "Status": item.status,
-                    "Wheels": item.w.join(" | "), "Expats": item.e.join(" | "), "Locals": item.l.join(" | "), "Weapons": item.wp.join(" | ")
-                });
+                pb.innerHTML += `<tr>
+                    <td><span class="ref-badge">${i.ref}</span><br><strong class="text-primary small">${i.ofp||'-'}</strong></td>
+                    <td class="text-start"><strong style="color:var(--cr-olive);">${i.full_bn}</strong>${names}</td>
+                    <td><span class="badge bg-secondary">${i.ta}</span><br><small>${i.pt}</small></td>
+                    <td>${i.memo}${fileLink}</td><td>${i.sd}</td><td>${i.rd}</td><td>${i.creator}</td>
+                    <td><span class="badge ${s}">${i.status}</span></td>
+                    <td><button class="btn btn-sm btn-outline-dark" onclick="openModal('permits', ${i.id})"><i class="fa fa-edit"></i></button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="deleteRec('perm', ${i.id})"><i class="fa fa-trash"></i></button></td></tr>`;
             });
 
-            const ws = XLSX.utils.json_to_sheet(dataToExport);
-            const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Data");
-            if(format === 'excel') XLSX.writeFile(wb, fileName + ".xlsx"); else XLSX.writeFile(wb, fileName + ".csv");
+            renderUsers();
         }
 
-        render();
+        function deleteRec(t, id) {
+            if(!confirm("هل تريد الحذف نهائياً؟")) return;
+            if(t==='auth') authData = authData.filter(x=>x.id!==id);
+            else permData = permData.filter(x=>x.id!==id);
+            saveToStorage(); render();
+        }
+
+        function renderUsers() {
+            const utb = document.getElementById('utb'); utb.innerHTML = '';
+            users.forEach((u, idx) => {
+                utb.innerHTML += `<tr><td>${u.u}</td><td>${u.p}</td><td>${u.r}</td><td>
+                ${u.u !== 'admin' ? `<button class="btn btn-sm btn-warning" onclick="editUser(${idx})"><i class="fa fa-edit"></i></button> <button class="btn btn-sm btn-danger" onclick="users.splice(${idx},1);saveToStorage();render();"><i class="fa fa-trash"></i></button>` : '-'}</td></tr>`;
+            });
+        }
+
+        function editUser(idx) {
+            document.getElementById('nu').value = users[idx].u;
+            document.getElementById('np').value = users[idx].p;
+            document.getElementById('edit-user-idx').value = idx;
+            document.getElementById('btn-save-user').innerText = "تحديث الحساب";
+        }
+
+        function handleUser() {
+            const u = document.getElementById('nu').value, p = document.getElementById('np').value, idx = parseInt(document.getElementById('edit-user-idx').value);
+            if(!u || !p) return alert("املأ الحقول");
+            if(idx === -1) users.push({u, p, r:'user'});
+            else { users[idx].u = u; users[idx].p = p; document.getElementById('edit-user-idx').value = -1; document.getElementById('btn-save-user').innerText = "إضافة حساب"; }
+            document.getElementById('nu').value = ''; document.getElementById('np').value = '';
+            saveToStorage(); render();
+        }
+
+        function resetFilters(t) {
+            if(t==='auth') { ['filter-auth-bn','filter-auth-list','filter-auth-from','filter-auth-to','filter-auth-status'].forEach(id=>document.getElementById(id).value=''); }
+            else { ['filter-perm-bn','filter-perm-ofp','filter-perm-list','filter-perm-from','filter-perm-to'].forEach(id=>document.getElementById(id).value=''); }
+            render();
+        }
+
+        function exportData(t) {
+            const data = t==='auth' ? authData : permData;
+            const ws = XLSX.utils.json_to_sheet(data.map(i => ({ Ref: i.ref, Book: i.bn_orig, Memo: i.memo, OFP: i.ofp, Sent: i.sd, Received: i.rd, By: i.creator, Status: i.status, Wheels: i.w.join(' | '), Expats: i.e.join(' | '), Locals: i.l.join(' | ') })));
+            const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Data");
+            XLSX.writeFile(wb, `ControlRisks_${t}.xlsx`);
+        }
+
+        function toggleLanguage() {
+            lang = lang === 'ar' ? 'en' : 'ar';
+            document.getElementById('html-tag').dir = lang === 'ar' ? 'rtl' : 'ltr';
+            document.body.className = lang === 'ar' ? 'rtl-mode text-start' : 'ltr-mode text-start';
+        }
     </script>
 </body>
 </html>
