@@ -4,51 +4,77 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Control Risks | OFP Tracker</title>
-    <!-- CSS Dependencies -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css">
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" id="bootstrap-rtl">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- SheetJS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <style>
+        /* UI/UX Color Palette & Variables */
         :root { 
-            --cr-olive: #3D4928; --cr-olive-light: #556B2F; 
-            --cr-dark: #1a1a1a; --cr-light: #f8f9fa; 
+            --cr-olive: #3D4928; 
+            --cr-olive-light: #556B2F; 
+            --cr-olive-soft: #eef2e6;
+            --cr-dark: #1a1a1a; 
+            --cr-light: #f8f9fa;
+            --cr-border: #e0e0e0;
         }
-        body { font-family: 'Cairo', sans-serif; background-color: var(--cr-light); margin: 0; color: #333; }
         
-        /* Sidebar */
-        #sidebar { width: 260px; background-color: var(--cr-dark); color: white; position: fixed; height: 100%; z-index: 1000; transition: 0.3s; }
-        .sidebar-header { background: var(--cr-olive); padding: 25px 15px; text-align: center; border-bottom: 2px solid rgba(255,255,255,0.1); }
-        #sidebar ul { list-style: none; padding: 0; margin-top: 10px; }
-        #sidebar ul li a { padding: 15px 20px; display: block; color: #adb5bd; text-decoration: none; border-bottom: 1px solid #2d3748; cursor: pointer; transition: 0.3s; border-right: 4px solid transparent; }
-        #sidebar ul li a:hover, #sidebar ul li a.active { background: var(--cr-olive-light); color: white; border-right: 4px solid white; padding-right: 25px; }
+        body { font-family: 'Cairo', sans-serif; background-color: var(--cr-light); margin: 0; color: #333; transition: all 0.3s ease; }
         
-        /* Layout */
-        .content { margin-right: 260px; min-height: 100vh; transition: 0.3s; padding: 0; }
-        .top-navbar { background: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        /* Sidebar Styling */
+        #sidebar { width: 260px; background-color: var(--cr-dark); color: white; position: fixed; height: 100%; z-index: 1000; transition: 0.3s; box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
+        .sidebar-header { background: var(--cr-olive); padding: 30px 15px; text-align: center; border-bottom: 2px solid rgba(255,255,255,0.1); }
+        .sidebar-header h5 { color: white; margin: 0; font-weight: 700; letter-spacing: 1px; }
+        #sidebar ul { list-style: none; padding: 0; margin-top: 15px; }
+        #sidebar ul li a { padding: 15px 20px; display: block; color: #a0aec0; text-decoration: none; border-bottom: 1px solid #2d3748; cursor: pointer; transition: all 0.3s ease; border-right: 4px solid transparent; }
+        #sidebar ul li a:hover { background: rgba(85, 107, 47, 0.3); color: white; padding-right: 25px; }
+        #sidebar ul li a.active { background: var(--cr-olive-light); color: white; border-right: 4px solid white; padding-right: 25px; font-weight: 600; box-shadow: inset 0 0 10px rgba(0,0,0,0.2); }
         
-        /* UI Elements */
-        .btn-cr { background-color: var(--cr-olive); color: white; border: none; font-weight: bold; transition: 0.3s; }
-        .btn-cr:hover { background-color: var(--cr-olive-light); transform: translateY(-1px); color: white; }
-        .custom-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        .filter-box { background: white; padding: 15px; border-radius: 10px; border: 1px solid #eee; margin-bottom: 15px; }
-        .filter-label { font-size: 0.75rem; font-weight: bold; color: #666; margin-bottom: 3px; display: block; }
+        /* Main Content & Navbar */
+        .content { margin-right: 260px; min-height: 100vh; transition: 0.3s; padding-bottom: 40px; }
+        .top-navbar { background: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 15px rgba(0,0,0,0.05); margin-bottom: 25px; position: sticky; top: 0; z-index: 999; }
+        
+        /* Buttons UX */
+        .btn-cr { background-color: var(--cr-olive); color: white; border: none; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); font-weight: 600; }
+        .btn-cr:hover { background-color: var(--cr-olive-light); transform: translateY(-2px); box-shadow: 0 4px 10px rgba(61, 73, 40, 0.3); color: white; }
+        .btn-cr:active { transform: scale(0.97); }
+        
+        /* Cards & Containers */
+        .custom-card { background: white; border-radius: 15px; padding: 25px; box-shadow: 0 8px 30px rgba(0,0,0,0.04); margin-bottom: 20px; border: 1px solid var(--cr-border); }
+        
+        /* Filters UI */
+        .filter-box { background: white; padding: 20px; border-radius: 12px; border: 1px solid var(--cr-border); margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
+        .filter-label { font-size: 0.8rem; color: #6c757d; margin-bottom: 5px; display: block; font-weight: 700; }
+        .filter-box .form-control, .filter-box .form-select { font-size: 0.9rem; border-radius: 8px; border: 1px solid #ced4da; transition: 0.3s; }
+        .filter-box .form-control:focus, .filter-box .form-select:focus { border-color: var(--cr-olive); box-shadow: 0 0 0 0.2rem rgba(61, 73, 40, 0.25); }
+        
+        /* Tables UI */
+        .table { margin-bottom: 0; }
+        .table th { font-weight: 600; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.5px; border-bottom-width: 2px; }
+        .table-dark th { background-color: var(--cr-olive) !important; border-color: var(--cr-olive-light) !important; }
+        .table-success th { background-color: var(--cr-olive-soft) !important; color: var(--cr-olive) !important; border-color: #dbe4c8 !important; }
+        .table tbody tr { transition: all 0.2s ease; }
+        .table tbody tr:hover { background-color: #f8faf5; transform: scale(1.001); box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        
+        /* Badges & Previews */
+        .ref-badge { font-size: 0.75rem; padding: 4px 10px; border-radius: 6px; background: var(--cr-olive-soft); color: var(--cr-olive); border: 1px solid #dbe4c8; font-weight: 700; letter-spacing: 0.5px; }
+        .names-preview { font-size: 0.8rem; background: #fafbfc; border: 1px solid #f0f0f0; padding: 10px; border-radius: 8px; margin-top: 10px; max-height: 100px; overflow-y: auto; color: #555; line-height: 1.6; text-align: start; }
+        .names-preview strong { color: var(--cr-dark); font-weight: 700; }
 
-        /* Names Box */
-        .names-display { font-size: 0.8rem; background: #fafafa; border: 1px solid #eee; padding: 8px; border-radius: 6px; margin-top: 5px; max-height: 80px; overflow-y: auto; text-align: right; }
-        .ref-badge { font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; background: #f0f4e8; color: var(--cr-olive); border: 1px solid var(--cr-olive); font-weight: bold; }
-
-        /* Login */
+        /* Login Page */
         #login-page { height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--cr-dark) 0%, var(--cr-olive) 100%); position: fixed; width: 100%; top:0; left:0; z-index: 2000; }
-        .login-card { background: white; padding: 40px; border-radius: 20px; width: 400px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+        .login-card { background: white; padding: 50px 40px; border-radius: 20px; width: 100%; max-width: 420px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.4); }
         .login-card h2 { color: var(--cr-olive); font-weight: 800; margin-bottom: 5px; }
-        
-        /* Tables */
-        .table thead th { background-color: #f1f3f5; color: #495057; font-weight: 700; font-size: 0.85rem; border-bottom: 2px solid #dee2e6; }
-        
+
+        /* LTR adjustments */
         .ltr-mode .content { margin-right: 0; margin-left: 260px; }
         .ltr-mode #sidebar { right: auto; left: 0; }
+        .ltr-mode #sidebar ul li a { border-right: none; border-left: 4px solid transparent; padding-right: 20px; padding-left: 20px; }
+        .ltr-mode #sidebar ul li a:hover { padding-left: 25px; padding-right: 20px; }
+        .ltr-mode #sidebar ul li a.active { border-left: 4px solid white; padding-left: 25px; padding-right: 20px; }
     </style>
 </head>
 <body class="rtl-mode text-start">
@@ -58,19 +84,22 @@
         <div class="login-card">
             <h2>CONTROL RISKS</h2>
             <p class="text-muted mb-4 fw-bold">OFP Application Tracker</p>
-            <div id="login-error" class="alert alert-danger p-2 small" style="display: none;">خطأ في اسم المستخدم أو كلمة المرور</div>
             
+            <div id="login-error" class="alert alert-danger p-2 small fw-bold" style="display: none;">
+                <i class="fa fa-exclamation-circle"></i> اسم المستخدم أو كلمة المرور غير صحيحة.
+            </div>
+
             <!-- أزلنا <form> واستخدمنا <div> لمنع Refresh المتصفح -->
             <div class="mb-3 text-start">
-                <label class="small fw-bold">اسم المستخدم</label>
-                <input type="text" id="userInput" class="form-control">
+                <label class="fw-bold small mb-1">اسم المستخدم</label>
+                <input type="text" id="userInput" class="form-control form-control-lg">
             </div>
             <div class="mb-4 text-start">
-                <label class="small fw-bold">كلمة المرور</label>
-                <input type="password" id="passInput" class="form-control" onkeypress="if(event.key === 'Enter') loginSystem()">
+                <label class="fw-bold small mb-1">كلمة المرور</label>
+                <input type="password" id="passInput" class="form-control form-control-lg" onkeypress="if(event.key === 'Enter') loginSystem()">
             </div>
-            <button onclick="loginSystem()" class="btn btn-cr w-100 p-2">دخول</button>
-            <div class="mt-3"><a href="#" class="text-muted small text-decoration-none" onclick="alert('compad.southiraq@controlrisks.com')">نسيت كلمة السر؟</a></div>
+            <button onclick="loginSystem()" class="btn btn-cr w-100 p-3 fs-5">تسجيل الدخول</button>
+            <div class="mt-4"><a href="#" class="text-muted small text-decoration-none" onclick="alert('يرجى التواصل مع الدعم التقني: compad.southiraq@controlrisks.com')">نسيت كلمة السر؟</a></div>
         </div>
     </div>
 
@@ -78,89 +107,161 @@
     <div id="main-dashboard" style="display: none;">
         <nav id="sidebar">
             <div class="sidebar-header"><h5>CONTROL RISKS</h5></div>
-            <ul id="nav-links">
-                <li><a onclick="showTab('auth')" id="link-auth" class="active"><i class="fa fa-folder ms-2"></i> الطلبات للهيئات</a></li>
-                <li><a onclick="showTab('permits')" id="link-permits"><i class="fa fa-check-circle ms-2"></i> التصاريح المستلمة</a></li>
-                <li id="admin-menu" style="display: none;"><a onclick="showTab('users')" id="link-users"><i class="fa fa-users-cog ms-2"></i> إدارة الحسابات</a></li>
-                <li><a onclick="location.reload()"><i class="fa fa-sign-out-alt ms-2"></i> خروج</a></li>
+            <ul>
+                <li><a onclick="showTab('auth')" id="link-auth" class="active"><i class="fa fa-building-shield ms-2"></i> الطلبات للهيئات</a></li>
+                <li><a onclick="showTab('permits')" id="link-permits"><i class="fa fa-id-card-clip ms-2"></i> التصاريح المستلمة</a></li>
+                <li id="admin-menu" style="display: none;"><a onclick="showTab('users')" id="link-users"><i class="fa fa-users-gear ms-2"></i> إدارة الحسابات</a></li>
+                <li><a onclick="location.reload()"><i class="fa fa-power-off ms-2"></i> تسجيل الخروج</a></li>
             </ul>
         </nav>
 
         <div class="content">
             <header class="top-navbar">
-                <button class="btn btn-sm btn-outline-secondary fw-bold" onclick="toggleLanguage()">EN / AR</button>
-                <div class="fw-bold">مرحباً: <span id="user-display" class="text-success"></span></div>
+                <div><button class="btn btn-sm btn-outline-secondary fw-bold" onclick="toggleLanguage()">EN / AR</button></div>
+                <div>مرحباً: <strong id="user-display" style="color: var(--cr-olive);"></strong> <i class="fa fa-user-circle ms-1"></i></div>
             </header>
 
-            <div class="p-4">
-                <!-- قسم الهيئات -->
+            <div class="px-4">
+                <!-- سجل الهيئات -->
                 <div id="auth-section">
                     <div class="d-flex justify-content-between mb-3 align-items-center">
-                        <h3 class="fw-bold m-0">الطلبات للهيئات</h3>
-                        <button class="btn btn-cr px-4" onclick="openModal('auth')"><i class="fa fa-plus me-1"></i> إضافة طلب</button>
+                        <h3 class="fw-bold mb-0 text-dark">سجل الطلبات للهيئات</h3>
+                        <button class="btn btn-cr shadow-sm px-4 py-2" onclick="openModal('auth')"><i class="fa fa-plus me-1"></i> إنشاء طلب جديد</button>
                     </div>
-
+                    
                     <!-- الفلاتر -->
-                    <div class="filter-box row g-2 align-items-end">
-                        <div class="col-md-2"><label class="filter-label">رقم الكتاب</label><input type="text" id="filter-auth-bn" class="form-control" placeholder="بحث..." onkeyup="render()"></div>
-                        <div class="col-md-3"><label class="filter-label">البحث في الأسماء/القوائم</label><input type="text" id="filter-auth-list" class="form-control" placeholder="اسم، سلاح، عجلة..." onkeyup="render()"></div>
-                        <div class="col-md-2"><label class="filter-label">من تاريخ</label><input type="date" id="filter-auth-from" class="form-control" onchange="render()"></div>
-                        <div class="col-md-2"><label class="filter-label">إلى تاريخ</label><input type="date" id="filter-auth-to" class="form-control" onchange="render()"></div>
-                        <div class="col-md-2"><label class="filter-label">الحالة</label><select id="filter-auth-status" class="form-select" onchange="render()"><option value="">الكل</option><option value="Pending">Pending</option><option value="Done">Completed</option></select></div>
-                        <div class="col-md-1"><button class="btn btn-secondary w-100" onclick="resetFilters('auth')"><i class="fa fa-sync"></i></button></div>
+                    <div class="filter-box">
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md-2">
+                                <span class="filter-label">رقم الكتاب</span>
+                                <input type="text" id="f-auth-booknum" class="form-control" placeholder="مثال: 105" onkeyup="render()">
+                            </div>
+                            <div class="col-md-3">
+                                <span class="filter-label">بحث في الأسماء (أجانب/عراقيين/عجلات/أسلحة)</span>
+                                <input type="text" id="f-auth-lists" class="form-control" placeholder="ابحث عن اسم أو رقم..." onkeyup="render()">
+                            </div>
+                            <div class="col-md-2">
+                                <span class="filter-label">رقم المذكرة</span>
+                                <input type="text" id="f-auth-memo" class="form-control" placeholder="رقم المذكرة..." onkeyup="render()">
+                            </div>
+                            <div class="col-md-2">
+                                <span class="filter-label">من تاريخ (إرسال/استلام)</span>
+                                <input type="date" id="f-auth-date-from" class="form-control" onchange="render()">
+                            </div>
+                            <div class="col-md-2">
+                                <span class="filter-label">إلى تاريخ</span>
+                                <input type="date" id="f-auth-date-to" class="form-control" onchange="render()">
+                            </div>
+                            <div class="col-md-1">
+                                <span class="filter-label">الحالة</span>
+                                <select id="f-auth-status" class="form-select" onchange="render()">
+                                    <option value="">الكل</option>
+                                    <option value="Pending">Pending</option>
+                                    <option value="Done">Completed</option>
+                                </select>
+                            </div>
+                            <div class="col-md-12 text-end mt-2">
+                                <button class="btn btn-sm btn-outline-secondary px-4" onclick="clearFilters('auth')"><i class="fa fa-eraser me-1"></i> مسح الفلاتر</button>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="custom-card table-responsive">
-                        <table class="table table-hover align-middle border text-center">
-                            <thead>
+                        <table class="table align-middle text-center">
+                            <thead class="table-dark">
                                 <tr>
-                                    <th>Ref</th><th style="width: 30%;">الكتاب والأسماء</th><th>الهيئة/النوع</th><th>المذكرة</th><th>إرسال</th><th>استلام</th><th>بواسطة</th><th>الحالة</th><th>إجراء</th>
+                                    <th>Ref</th>
+                                    <th style="width: 30%;">اسم الكتاب وتفاصيل القوائم</th>
+                                    <th>الهيئة / النوع</th>
+                                    <th>المذكرة <i class="fa fa-paperclip"></i></th>
+                                    <th>إرسال</th>
+                                    <th>استلام</th>
+                                    <th>الحالة</th>
+                                    <th>الإجراء</th>
                                 </tr>
                             </thead>
                             <tbody id="auth-body"></tbody>
                         </table>
-                        <div class="mt-3"><button class="btn btn-success btn-sm" onclick="exportData('auth')">تصدير Excel</button></div>
+                        <div class="mt-4 text-end">
+                            <button class="btn btn-success btn-sm px-3 shadow-sm" onclick="exportData('auth', 'excel')"><i class="fa fa-file-excel me-1"></i> تصدير Excel</button>
+                        </div>
                     </div>
                 </div>
 
-                <!-- قسم التصاريح -->
+                <!-- سجل التصاريح -->
                 <div id="permits-section" style="display: none;">
-                    <h3 class="fw-bold mb-3" style="color: var(--cr-olive);">التصاريح المستلمة</h3>
-                    <!-- فلاتر التصاريح -->
-                    <div class="filter-box row g-2 align-items-end">
-                        <div class="col-md-2"><label class="filter-label">رقم الكتاب</label><input type="text" id="filter-perm-bn" class="form-control" onkeyup="render()"></div>
-                        <div class="col-md-2"><label class="filter-label">OFP / Ref</label><input type="text" id="filter-perm-ofp" class="form-control" onkeyup="render()"></div>
-                        <div class="col-md-3"><label class="filter-label">بحث في الأسماء</label><input type="text" id="filter-perm-list" class="form-control" onkeyup="render()"></div>
-                        <div class="col-md-2"><label class="filter-label">من تاريخ</label><input type="date" id="filter-perm-from" class="form-control" onchange="render()"></div>
-                        <div class="col-md-2"><label class="filter-label">إلى تاريخ</label><input type="date" id="filter-perm-to" class="form-control" onchange="render()"></div>
-                        <div class="col-md-1"><button class="btn btn-secondary w-100" onclick="resetFilters('perm')"><i class="fa fa-sync"></i></button></div>
+                    <div class="d-flex justify-content-between mb-3 align-items-center">
+                        <h3 class="fw-bold mb-0" style="color: var(--cr-olive);">سجل التصاريح المستلمة</h3>
+                    </div>
+                    
+                    <!-- الفلاتر -->
+                    <div class="filter-box">
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md-2">
+                                <span class="filter-label">رقم الكتاب</span>
+                                <input type="text" id="f-perm-booknum" class="form-control" placeholder="رقم الكتاب..." onkeyup="render()">
+                            </div>
+                            <div class="col-md-3">
+                                <span class="filter-label">بحث في الأسماء (أجانب/عراقيين/عجلات/أسلحة)</span>
+                                <input type="text" id="f-perm-lists" class="form-control" placeholder="ابحث عن اسم أو رقم..." onkeyup="render()">
+                            </div>
+                            <div class="col-md-2">
+                                <span class="filter-label">OFP / المذكرة</span>
+                                <input type="text" id="f-perm-ofp-memo" class="form-control" placeholder="ابحث..." onkeyup="render()">
+                            </div>
+                            <div class="col-md-2">
+                                <span class="filter-label">من تاريخ</span>
+                                <input type="date" id="f-perm-date-from" class="form-control" onchange="render()">
+                            </div>
+                            <div class="col-md-2">
+                                <span class="filter-label">إلى تاريخ</span>
+                                <input type="date" id="f-perm-date-to" class="form-control" onchange="render()">
+                            </div>
+                            <div class="col-md-1">
+                                <span class="filter-label">الحالة</span>
+                                <select id="f-perm-status" class="form-select" onchange="render()">
+                                    <option value="">الكل</option>
+                                    <option value="Pending">Pending</option>
+                                    <option value="Completed">Completed</option>
+                                </select>
+                            </div>
+                            <div class="col-md-12 text-end mt-2">
+                                <button class="btn btn-sm btn-outline-secondary px-4" onclick="clearFilters('perm')"><i class="fa fa-eraser me-1"></i> مسح الفلاتر</button>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="custom-card table-responsive">
-                        <table class="table table-bordered align-middle border text-center">
-                            <thead class="table-success text-dark">
+                        <table class="table align-middle text-center">
+                            <thead class="table-success">
                                 <tr>
-                                    <th>Ref / OFP</th><th style="width: 30%;">كتاب التصريح والأسماء</th><th>الهيئة/النوع</th><th>المذكرة</th><th>إرسال</th><th>استلام</th><th>بواسطة</th><th>الحالة</th><th>إجراء</th>
+                                    <th>Ref / OFP</th>
+                                    <th style="width: 30%;">التصريح الجديد والتفاصيل</th>
+                                    <th>الهيئة / النوع</th>
+                                    <th>المذكرة <i class="fa fa-paperclip"></i></th>
+                                    <th>إرسال</th><th>استلام</th><th>الحالة</th><th>إجراء</th>
                                 </tr>
                             </thead>
                             <tbody id="perm-body"></tbody>
                         </table>
-                        <div class="mt-3"><button class="btn btn-success btn-sm" onclick="exportData('perm')">تصدير Excel</button></div>
+                        <div class="mt-4 text-end">
+                            <button class="btn btn-success btn-sm px-3 shadow-sm" onclick="exportData('permits', 'excel')"><i class="fa fa-file-excel me-1"></i> تصدير Excel</button>
+                        </div>
                     </div>
                 </div>
 
-                <!-- قسم الحسابات -->
+                <!-- إدارة الحسابات -->
                 <div id="users-section" style="display: none;">
-                    <h3 class="fw-bold mb-4">إدارة الحسابات</h3>
+                    <h3 class="fw-bold mb-4 text-dark">إدارة الحسابات</h3>
                     <div class="custom-card">
-                        <div class="row g-2 mb-4">
-                            <input type="hidden" id="edit-user-idx" value="-1">
-                            <div class="col-md-4"><label class="small fw-bold">اسم المستخدم</label><input id="nu" class="form-control"></div>
-                            <div class="col-md-4"><label class="small fw-bold">كلمة المرور</label><input id="np" class="form-control"></div>
-                            <div class="col-md-4 d-flex align-items-end"><button id="btn-save-user" class="btn btn-cr w-100 fw-bold" onclick="handleUser()">حفظ الحساب</button></div>
+                        <div class="row g-3 mb-4 text-start bg-light p-3 rounded border">
+                            <input type="hidden" id="edit-user-index" value="-1">
+                            <div class="col-md-4"><label class="fw-bold small mb-1">اسم المستخدم</label><input id="nu" class="form-control"></div>
+                            <div class="col-md-4"><label class="fw-bold small mb-1">كلمة المرور</label><input id="np" class="form-control"></div>
+                            <div class="col-md-4 d-flex align-items-end"><button id="btn-save-user" class="btn btn-cr w-100 fw-bold" onclick="handleUser()">إضافة حساب</button></div>
                         </div>
                         <table class="table table-striped border text-center">
-                            <thead class="table-dark"><tr><th>المستخدم</th><th>الباسورد</th><th>الرتبة</th><th>الإجراء</th></tr></thead>
+                            <thead class="table-dark"><tr><th>المستخدم</th><th>كلمة المرور</th><th>الرتبة</th><th>الإجراءات</th></tr></thead>
                             <tbody id="utb"></tbody>
                         </table>
                     </div>
@@ -172,16 +273,15 @@
     <!-- Modal الموحد -->
     <div class="modal fade" id="mainModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-xl">
-            <div class="modal-content text-start">
-                <!-- أزلنا <form> لمنع Refresh واستبدلناه بـ div -->
-                <div class="modal-header text-white" style="background: var(--cr-olive);">
+            <div class="modal-content text-start border-0 shadow-lg">
+                <div class="modal-header text-white" style="background-color: var(--cr-olive);">
                     <h5 class="modal-title fw-bold">بيانات الطلب</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body p-4">
                     <input type="hidden" id="form-type"><input type="hidden" id="edit-id">
                     <div class="row g-3">
-                        <div class="col-md-3"><label class="fw-bold small">رقم الكتاب</label><input type="text" id="f-bn" class="form-control" required></div>
+                        <div class="col-md-3"><label class="fw-bold small">رقم الكتاب</label><input type="text" id="f-bn" class="form-control" placeholder="مثال: 105"></div>
                         <div class="col-md-3"><label class="fw-bold small">نوع التصريح</label><select id="f-pt" class="form-select"><option value="مؤقت">مؤقت</option><option value="دائمي">دائمي</option></select></div>
                         <div class="col-md-3"><label class="fw-bold small">الهيئة</label><select id="f-ta" class="form-select"><option value="BGC">BGC</option><option value="ROO">ROO</option><option value="SRC">SRC</option></select></div>
                         <div class="col-md-3" id="ofp-box"><label class="fw-bold small text-primary">OFP Number</label><input type="text" id="f-ofp" class="form-control"></div>
@@ -190,41 +290,39 @@
                         <div class="col-md-3"><label class="fw-bold small">رقم المذكرة</label><input type="text" id="f-memo" class="form-control"></div>
                         <div class="col-md-3"><label class="fw-bold small">مرفق (PDF/Image)</label><input type="file" id="f-file" class="form-control"></div>
                         
-                        <div class="col-12 mt-3"><div class="alert alert-light border small text-center fw-bold">يمكنك النسخ واللصق مباشرة من الوورد هنا</div></div>
-                        <div class="col-md-3"><label class="small fw-bold">العجلات</label><textarea id="f-w" class="form-control" rows="4"></textarea></div>
-                        <div class="col-md-3"><label class="small fw-bold">الأجانب</label><textarea id="f-e" class="form-control" rows="4"></textarea></div>
-                        <div class="col-md-3"><label class="small fw-bold">العراقيين</label><textarea id="f-l" class="form-control" rows="4"></textarea></div>
-                        <div class="col-md-3"><label class="small fw-bold">الأسلحة</label><textarea id="f-wp" class="form-control" rows="4"></textarea></div>
+                        <div class="col-12 mt-4"><div class="alert alert-secondary border small text-center fw-bold"><i class="fa fa-info-circle me-1"></i> يمكنك نسخ القوائم من الوورد ولصقها مباشرة في الخانات أدناه (كل اسم في سطر)</div></div>
+                        <div class="col-md-3"><label class="fw-bold small text-muted"><i class="fa fa-car"></i> العجلات</label><textarea id="f-w" class="form-control" rows="4"></textarea></div>
+                        <div class="col-md-3"><label class="fw-bold small text-muted"><i class="fa fa-user"></i> الأجانب</label><textarea id="f-e" class="form-control" rows="4"></textarea></div>
+                        <div class="col-md-3"><label class="fw-bold small text-muted"><i class="fa fa-user-tie"></i> العراقيين</label><textarea id="f-l" class="form-control" rows="4"></textarea></div>
+                        <div class="col-md-3"><label class="fw-bold small text-muted"><i class="fa fa-gun"></i> الأسلحة</label><textarea id="f-wp" class="form-control" rows="4"></textarea></div>
                     </div>
                 </div>
-                <div class="modal-footer"><button onclick="saveOrder()" class="btn btn-cr px-5">حفظ وتأكيد</button></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light px-4 border" data-bs-dismiss="modal">إلغاء</button>
+                    <button onclick="saveOrder()" class="btn btn-cr px-5 ms-2">حفظ وتأكيد</button>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // Data Load
         let authData = JSON.parse(localStorage.getItem('CR_AUTH_DATA')) || [];
         let permData = JSON.parse(localStorage.getItem('CR_PERM_DATA')) || [];
         let users = JSON.parse(localStorage.getItem('CR_USER_DATA')) || [{u:'admin', p:'1234', r:'admin'}];
-        let currentUser = null;
-        let lang = 'ar';
+        let currentUser = null; let lang = 'ar';
         const modal = new bootstrap.Modal(document.getElementById('mainModal'));
 
-        // Save Function
         function saveToStorage() {
             try {
                 localStorage.setItem('CR_AUTH_DATA', JSON.stringify(authData));
                 localStorage.setItem('CR_PERM_DATA', JSON.stringify(permData));
                 localStorage.setItem('CR_USER_DATA', JSON.stringify(users));
-            } catch(e) {
-                alert("⚠️ الذاكرة ممتلئة! يرجى حذف بعض الطلبات القديمة أو المرفقات.");
-            }
+            } catch(e) { alert("⚠️ الذاكرة ممتلئة! يرجى حذف المرفقات الكبيرة أو الطلبات القديمة."); }
         }
 
-        // --- إصلاح تسجيل الدخول ---
+        // Login Logic
         function loginSystem() {
             const u = document.getElementById('userInput').value;
             const p = document.getElementById('passInput').value;
@@ -250,13 +348,13 @@
         }
 
         function openModal(type, id = null) {
-            // تفريغ الحقول يدوياً
             document.getElementById('f-bn').value = ""; document.getElementById('f-pt').value = "مؤقت"; 
             document.getElementById('f-ta').value = "BGC"; document.getElementById('f-memo').value = ""; 
             document.getElementById('f-ofp').value = ""; document.getElementById('f-sd').value = ""; 
             document.getElementById('f-rd').value = ""; document.getElementById('f-w').value = ""; 
             document.getElementById('f-e').value = ""; document.getElementById('f-l').value = ""; 
             document.getElementById('f-wp').value = ""; document.getElementById('f-file').value = "";
+            document.getElementById('f-file').removeAttribute('data-saved-file');
 
             document.getElementById('form-type').value = type;
             document.getElementById('edit-id').value = id || "";
@@ -264,12 +362,13 @@
             
             if(id) {
                 const item = (type==='auth'?authData:permData).find(x => x.id == id);
-                document.getElementById('f-bn').value = item.bn_orig; document.getElementById('f-pt').value = item.pt;
-                document.getElementById('f-ta').value = item.ta; document.getElementById('f-memo').value = item.memo;
-                document.getElementById('f-ofp').value = item.ofp || ""; document.getElementById('f-sd').value = item.sd;
-                document.getElementById('f-rd').value = item.rd; document.getElementById('f-w').value = item.w.join('\n');
+                document.getElementById('f-bn').value = item.bn_orig || ""; document.getElementById('f-pt').value = item.pt;
+                document.getElementById('f-ta').value = item.ta; document.getElementById('f-memo').value = item.memo || "";
+                document.getElementById('f-ofp').value = item.ofp || ""; document.getElementById('f-sd').value = item.sd || "";
+                document.getElementById('f-rd').value = item.rd || ""; document.getElementById('f-w').value = item.w.join('\n');
                 document.getElementById('f-e').value = item.e.join('\n'); document.getElementById('f-l').value = item.l.join('\n');
                 document.getElementById('f-wp').value = item.wp.join('\n');
+                if(item.file) document.getElementById('f-file').setAttribute('data-saved-file', item.file);
             }
             modal.show();
         }
@@ -279,10 +378,10 @@
             if(!bnInput) return alert("يرجى إدخال رقم الكتاب");
 
             const type = document.getElementById('form-type').value, id = document.getElementById('edit-id').value;
-            const getL = (id) => document.getElementById(id).value.split('\n').filter(l => l.trim() !== "");
+            const getL = (elementId) => document.getElementById(elementId).value.split('\n').filter(l => l.trim() !== "");
             
             const fileInput = document.getElementById('f-file');
-            let fileBase64 = null;
+            let fileBase64 = fileInput.getAttribute('data-saved-file') || null;
             if(fileInput.files.length > 0) {
                 fileBase64 = await new Promise(resolve => {
                     const reader = new FileReader();
@@ -293,30 +392,28 @@
 
             const entry = {
                 id: id ? parseInt(id) : Date.now(),
-                bn_orig: bnInput,
-                pt: document.getElementById('f-pt').value,
-                ta: document.getElementById('f-ta').value,
-                memo: document.getElementById('f-memo').value,
-                ofp: document.getElementById('f-ofp').value,
-                sd: document.getElementById('f-sd').value,
-                rd: document.getElementById('f-rd').value,
+                bn_orig: bnInput, pt: document.getElementById('f-pt').value, ta: document.getElementById('f-ta').value,
+                memo: document.getElementById('f-memo').value, ofp: document.getElementById('f-ofp').value,
+                sd: document.getElementById('f-sd').value, rd: document.getElementById('f-rd').value,
                 w: getL('f-w'), e: getL('f-e'), l: getL('f-l'), wp: getL('f-wp'),
                 creator: id ? ( (type==='auth'?authData:permData).find(x=>x.id==id).creator ) : currentUser.u,
                 ref: id ? ( (type==='auth'?authData:permData).find(x=>x.id==id).ref ) : 'REF-'+Math.floor(1000+Math.random()*9000),
-                file: fileBase64 || (id ? (type==='auth'?authData:permData).find(x=>x.id==id).file : null)
+                file: fileBase64
             };
 
             const stats = `${entry.e.length} أجانب - ${entry.w.length} عجلات - ${entry.l.length} عراقيين`;
-            entry.status = entry.rd ? 'Done' : 'Pending';
-
+            
             if(type === 'auth') {
                 entry.full_bn = `TEMP - ${entry.bn_orig} - ${entry.pt} - ${stats} وفقط`;
+                entry.status = entry.rd ? 'Done' : 'Pending';
+
                 if(id) {
                     authData[authData.findIndex(x=>x.id == id)] = entry;
                     const pIdx = permData.findIndex(p => p.ref === entry.ref);
                     if(pIdx !== -1) {
-                        permData[pIdx].w=entry.w; permData[pIdx].e=entry.e; permData[pIdx].l=entry.l; permData[pIdx].wp=entry.wp;
-                        permData[pIdx].full_bn = `ISCO - ${permData[pIdx].bn_orig} - ${entry.pt} - ${stats} وفقط`;
+                        permData[pIdx].pt=entry.pt; permData[pIdx].ta=entry.ta; permData[pIdx].w=entry.w; permData[pIdx].e=entry.e; permData[pIdx].l=entry.l; permData[pIdx].wp=entry.wp;
+                        permData[pIdx].full_bn = `ISCO - ${permData[pIdx].bn_orig||""} - ${entry.pt} - ${stats} وفقط`;
+                        permData[pIdx].file = entry.file;
                     }
                 } else authData.push(entry);
 
@@ -333,76 +430,116 @@
             saveToStorage(); render(); modal.hide();
         }
 
+        function clearFilters(t) {
+            if(t==='auth') { ['f-auth-booknum','f-auth-lists','f-auth-memo','f-auth-date-from','f-auth-date-to','f-auth-status'].forEach(id=>document.getElementById(id).value=''); }
+            else { ['f-perm-booknum','f-perm-lists','f-perm-ofp-memo','f-perm-date-from','f-perm-date-to','f-perm-status'].forEach(id=>document.getElementById(id).value=''); }
+            render();
+        }
+
+        function openFile(base64Data) {
+            let win = window.open();
+            win.document.write('<iframe src="' + base64Data + '" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>');
+        }
+
+        function generateNamesPreview(item) {
+            let html = '';
+            if(item.w.length > 0 || item.e.length > 0 || item.l.length > 0 || item.wp.length > 0) {
+                html += `<div class="names-preview">`;
+                if(item.w.length > 0) html += `<strong>🚗 العجلات:</strong> ${item.w.join('، ')}<br>`;
+                if(item.e.length > 0) html += `<strong>👤 الأجانب:</strong> ${item.e.join('، ')}<br>`;
+                if(item.l.length > 0) html += `<strong>👨🏽 العراقيين:</strong> ${item.l.join('، ')}<br>`;
+                if(item.wp.length > 0) html += `<strong>🔫 الأسلحة:</strong> ${item.wp.join('، ')}<br>`;
+                html += `</div>`;
+            }
+            return html;
+        }
+
         function render() {
             // Auth Table
-            const fb = document.getElementById('filter-auth-bn').value.toLowerCase();
-            const fl = document.getElementById('filter-auth-list').value.toLowerCase();
-            const fst = document.getElementById('filter-auth-status').value;
-            const fdf = document.getElementById('filter-auth-from').value;
-            const fdt = document.getElementById('filter-auth-to').value;
+            const fbn = document.getElementById('f-auth-booknum').value.toLowerCase();
+            const flists = document.getElementById('f-auth-lists').value.toLowerCase();
+            const fmemo = document.getElementById('f-auth-memo').value.toLowerCase();
+            const fst = document.getElementById('f-auth-status').value;
+            const fdf = document.getElementById('f-auth-date-from').value;
+            const fdt = document.getElementById('f-auth-date-to').value;
 
             const fAuth = authData.filter(i => {
-                const matchBn = i.bn_orig.toLowerCase().includes(fb);
-                const matchLists = fl === '' || [...i.w, ...i.e, ...i.l, ...i.wp].some(n => n.toLowerCase().includes(fl));
+                const matchBn = (i.bn_orig||'').toLowerCase().includes(fbn);
+                const matchLists = flists === '' || [...i.w, ...i.e, ...i.l, ...i.wp].some(n => n.toLowerCase().includes(flists));
+                const matchMemo = (i.memo||'').toLowerCase().includes(fmemo);
                 const matchStatus = fst === '' || i.status === fst;
                 let matchDate = true;
                 if(fdf || fdt) {
-                    const date = i.sd || i.rd;
-                    if(!date) matchDate = false;
-                    else {
-                        if(fdf && date < fdf) matchDate = false;
-                        if(fdt && date > fdt) matchDate = false;
-                    }
+                    const sd = i.sd ? new Date(i.sd) : null; const rd = i.rd ? new Date(i.rd) : null;
+                    const dFrom = fdf ? new Date(fdf) : new Date('1900-01-01'); const dTo = fdt ? new Date(fdt) : new Date('2100-01-01');
+                    matchDate = (sd && sd >= dFrom && sd <= dTo) || (rd && rd >= dFrom && rd <= dTo);
                 }
-                return matchBn && matchLists && matchStatus && matchDate;
+                return matchBn && matchLists && matchMemo && matchStatus && matchDate;
             });
 
             const ab = document.getElementById('auth-body'); ab.innerHTML = '';
             fAuth.forEach(i => {
-                const names = `<div class="names-display"><strong>🚗 عجلات:</strong> ${i.w.join(', ')}<br><strong>👤 أجانب:</strong> ${i.e.join(', ')}<br><strong>👨🏽 عراقيين:</strong> ${i.l.join(', ')}</div>`;
-                const fileLink = i.file ? `<a href="${i.file}" target="_blank" class="text-danger ms-1"><i class="fa fa-paperclip"></i></a>` : '';
+                const fileIcon = i.file ? `<a href="#" onclick="openFile('${i.file}')" class="text-danger ms-2"><i class="fa fa-paperclip fa-lg"></i></a>` : '';
                 ab.innerHTML += `<tr>
-                    <td><span class="ref-badge">${i.ref}</span></td>
-                    <td class="text-start"><strong style="color:var(--cr-olive);">${i.full_bn}</strong>${names}</td>
-                    <td><span class="badge bg-secondary">${i.ta}</span><br><small>${i.pt}</small></td>
-                    <td>${i.memo}${fileLink}</td><td>${i.sd}</td><td>${i.rd}</td><td>${i.creator}</td>
+                    <td><span class="badge bg-secondary shadow-sm">${i.ref}</span></td>
+                    <td class="text-start"><span class="fw-bold" style="color: var(--cr-olive);">${i.full_bn}</span>${generateNamesPreview(i)}</td>
+                    <td><span class="badge bg-dark mb-1">${i.ta}</span><br><small class="text-muted fw-bold">${i.pt}</small></td>
+                    <td class="fw-bold">${i.memo||'-'}${fileIcon}</td><td><small>${i.sd||'-'}</small></td><td><small>${i.rd||'-'}</small></td>
                     <td><span class="badge ${i.status==='Done'?'bg-success':'bg-warning text-dark'}">${i.status}</span></td>
-                    <td><button class="btn btn-sm btn-outline-dark" onclick="openModal('auth', ${i.id})"><i class="fa fa-edit"></i></button>
-                    <button class="btn btn-sm btn-outline-danger" onclick="deleteRec('auth', ${i.id})"><i class="fa fa-trash"></i></button></td></tr>`;
+                    <td>
+                        <div class="btn-group shadow-sm">
+                            <button class="btn btn-sm btn-light border" onclick="openModal('auth', ${i.id})"><i class="fa fa-edit text-primary"></i></button>
+                            <button class="btn btn-sm btn-light border" onclick="deleteRec('auth', ${i.id})"><i class="fa fa-trash text-danger"></i></button>
+                        </div>
+                    </td>
+                </tr>`;
             });
 
             // Permits Table
-            const pbn = document.getElementById('filter-perm-bn').value.toLowerCase();
-            const pof = document.getElementById('filter-perm-ofp').value.toLowerCase();
-            const pli = document.getElementById('filter-perm-list').value.toLowerCase();
-            
+            const pbn = document.getElementById('f-perm-booknum').value.toLowerCase();
+            const plists = document.getElementById('f-perm-lists').value.toLowerCase();
+            const pom = document.getElementById('f-perm-ofp-memo').value.toLowerCase();
+            const pst = document.getElementById('f-perm-status').value;
+            const pdf = document.getElementById('f-perm-date-from').value;
+            const pdt = document.getElementById('f-perm-date-to').value;
+
             const fPerm = permData.filter(i => {
-                return i.bn_orig.toLowerCase().includes(pbn) && 
-                       (i.ofp||'').toLowerCase().includes(pof) &&
-                       (pli === '' || [...i.w, ...i.e, ...i.l, ...i.wp].some(n => n.toLowerCase().includes(pli)));
+                const matchBn = (i.bn_orig||'').toLowerCase().includes(pbn);
+                const matchLists = plists === '' || [...i.w, ...i.e, ...i.l, ...i.wp].some(n => n.toLowerCase().includes(plists));
+                const matchOM = ((i.ofp||'') + " " + (i.memo||'')).toLowerCase().includes(pom);
+                const matchStatus = pst === '' || i.status === pst;
+                let matchDate = true;
+                if(pdf || pdt) {
+                    const sd = i.sd ? new Date(i.sd) : null; const rd = i.rd ? new Date(i.rd) : null;
+                    const dFrom = pdf ? new Date(pdf) : new Date('1900-01-01'); const dTo = pdt ? new Date(pdt) : new Date('2100-01-01');
+                    matchDate = (sd && sd >= dFrom && sd <= dTo) || (rd && rd >= dFrom && rd <= dTo);
+                }
+                return matchBn && matchLists && matchOM && matchStatus && matchDate;
             });
 
             const pb = document.getElementById('perm-body'); pb.innerHTML = '';
             fPerm.forEach(i => {
-                const names = `<div class="names-display"><strong>🚗 عجلات:</strong> ${i.w.join(', ')}<br><strong>👤 أجانب:</strong> ${i.e.join(', ')}<br><strong>👨🏽 عراقيين:</strong> ${i.l.join(', ')}</div>`;
-                const s = i.status === 'Completed' ? 'bg-success' : 'bg-warning text-dark';
-                const fileLink = i.file ? `<a href="${i.file}" target="_blank" class="text-danger ms-1"><i class="fa fa-paperclip"></i></a>` : '';
-                
+                const fileIcon = i.file ? `<a href="#" onclick="openFile('${i.file}')" class="text-danger ms-2"><i class="fa fa-paperclip fa-lg"></i></a>` : '';
                 pb.innerHTML += `<tr>
-                    <td><span class="ref-badge">${i.ref}</span><br><strong class="text-primary small">${i.ofp||'-'}</strong></td>
-                    <td class="text-start"><strong style="color:var(--cr-olive);">${i.full_bn}</strong>${names}</td>
-                    <td><span class="badge bg-secondary">${i.ta}</span><br><small>${i.pt}</small></td>
-                    <td>${i.memo}${fileLink}</td><td>${i.sd}</td><td>${i.rd}</td><td>${i.creator}</td>
-                    <td><span class="badge ${s}">${i.status}</span></td>
-                    <td><button class="btn btn-sm btn-outline-dark" onclick="openModal('permits', ${i.id})"><i class="fa fa-edit"></i></button>
-                    <button class="btn btn-sm btn-outline-danger" onclick="deleteRec('perm', ${i.id})"><i class="fa fa-trash"></i></button></td></tr>`;
+                    <td><span class="badge bg-secondary shadow-sm mb-1">${i.ref}</span><br><span class="text-primary fw-bold small">${i.ofp||'No OFP'}</span></td>
+                    <td class="text-start"><span class="fw-bold" style="color: var(--cr-olive);">${i.full_bn}</span>${generateNamesPreview(i)}</td>
+                    <td><span class="badge bg-dark mb-1">${i.ta}</span><br><small class="text-muted fw-bold">${i.pt}</small></td>
+                    <td class="fw-bold">${i.memo||'-'}${fileIcon}</td><td><small>${i.sd||'-'}</small></td><td><small>${i.rd||'-'}</small></td>
+                    <td><span class="badge ${i.status==='Completed'?'bg-success':'bg-warning text-dark'}">${i.status}</span></td>
+                    <td>
+                        <div class="btn-group shadow-sm">
+                            <button class="btn btn-sm btn-light border" onclick="openModal('permits', ${i.id})"><i class="fa fa-edit text-primary"></i></button>
+                            <button class="btn btn-sm btn-light border" onclick="deleteRec('perm', ${i.id})"><i class="fa fa-trash text-danger"></i></button>
+                        </div>
+                    </td>
+                </tr>`;
             });
 
             renderUsers();
         }
 
         function deleteRec(t, id) {
-            if(!confirm("هل تريد الحذف نهائياً؟")) return;
+            if(!confirm("هل أنت متأكد من الحذف؟")) return;
             if(t==='auth') authData = authData.filter(x=>x.id!==id);
             else permData = permData.filter(x=>x.id!==id);
             saveToStorage(); render();
@@ -411,16 +548,22 @@
         function renderUsers() {
             const utb = document.getElementById('utb'); utb.innerHTML = '';
             users.forEach((u, idx) => {
-                utb.innerHTML += `<tr><td>${u.u}</td><td>${u.p}</td><td>${u.r}</td><td>
-                ${u.u !== 'admin' ? `<button class="btn btn-sm btn-warning" onclick="editUser(${idx})"><i class="fa fa-edit"></i></button> <button class="btn btn-sm btn-danger" onclick="users.splice(${idx},1);saveToStorage();render();"><i class="fa fa-trash"></i></button>` : '-'}</td></tr>`;
+                utb.innerHTML += `<tr>
+                    <td class="fw-bold">${u.u}</td><td>${u.p}</td>
+                    <td><span class="badge ${u.r === 'admin' ? 'bg-danger' : 'bg-primary'}">${u.r}</span></td>
+                    <td>${u.r !== 'admin' ? `
+                        <div class="btn-group">
+                            <button class="btn btn-sm btn-light border" onclick="editUser(${idx})"><i class="fa fa-edit text-warning"></i></button>
+                            <button class="btn btn-sm btn-light border" onclick="users.splice(${idx},1);saveToStorage();render();"><i class="fa fa-trash text-danger"></i></button>
+                        </div>` : '-'}
+                    </td>
+                </tr>`;
             });
         }
 
         function editUser(idx) {
-            document.getElementById('nu').value = users[idx].u;
-            document.getElementById('np').value = users[idx].p;
-            document.getElementById('edit-user-idx').value = idx;
-            document.getElementById('btn-save-user').innerText = "تحديث الحساب";
+            document.getElementById('nu').value = users[idx].u; document.getElementById('np').value = users[index].p;
+            document.getElementById('edit-user-idx').value = idx; document.getElementById('btn-save-user').innerHTML = "تحديث الحساب";
         }
 
         function handleUser() {
@@ -432,15 +575,13 @@
             saveToStorage(); render();
         }
 
-        function resetFilters(t) {
-            if(t==='auth') { ['filter-auth-bn','filter-auth-list','filter-auth-from','filter-auth-to','filter-auth-status'].forEach(id=>document.getElementById(id).value=''); }
-            else { ['filter-perm-bn','filter-perm-ofp','filter-perm-list','filter-perm-from','filter-perm-to'].forEach(id=>document.getElementById(id).value=''); }
-            render();
-        }
-
         function exportData(t) {
             const data = t==='auth' ? authData : permData;
-            const ws = XLSX.utils.json_to_sheet(data.map(i => ({ Ref: i.ref, Book: i.bn_orig, Memo: i.memo, OFP: i.ofp, Sent: i.sd, Received: i.rd, By: i.creator, Status: i.status, Wheels: i.w.join(' | '), Expats: i.e.join(' | '), Locals: i.l.join(' | ') })));
+            const ws = XLSX.utils.json_to_sheet(data.map(i => ({ 
+                Ref: i.ref, Book_No: i.bn_orig, Full_Name: i.full_bn, Authority: i.ta, Type: i.pt, 
+                Memo: i.memo||'', OFP: i.ofp||'', Sent: i.sd||'', Received: i.rd||'', 
+                Status: i.status, Creator: i.creator, Wheels: i.w.join(' | '), Expats: i.e.join(' | '), Locals: i.l.join(' | '), Weapons: i.wp.join(' | ') 
+            })));
             const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Data");
             XLSX.writeFile(wb, `ControlRisks_${t}.xlsx`);
         }
