@@ -6,81 +6,53 @@
     <title>Control Risks | OFP Tracker</title>
     <!-- Bootstrap -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" id="bootstrap-rtl">
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- SheetJS للتصدير -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <style>
-        /* UI/UX Color Palette & Variables */
-        :root { 
-            --cr-olive: #3D4928; 
-            --cr-olive-light: #556B2F; 
-            --cr-olive-soft: #eef2e6;
-            --cr-dark: #1a1a1a; 
-            --cr-light: #f8f9fa;
-            --cr-border: #e0e0e0;
-        }
+        :root { --cr-olive: #3D4928; --cr-olive-light: #556B2F; --cr-dark: #1a1a1a; --cr-light: #f4f7f1; }
+        body { font-family: 'Cairo', sans-serif; background-color: var(--cr-light); margin: 0; transition: all 0.3s ease; }
         
-        body { font-family: 'Cairo', sans-serif; background-color: var(--cr-light); margin: 0; color: #333; transition: all 0.3s ease; }
-        
-        /* Sidebar Styling */
-        #sidebar { width: 260px; background-color: var(--cr-dark); color: white; position: fixed; height: 100%; z-index: 1000; transition: 0.3s; box-shadow: 4px 0 15px rgba(0,0,0,0.1); }
+        #sidebar { width: 260px; background-color: var(--cr-dark); color: white; position: fixed; height: 100%; z-index: 1000; transition: 0.3s; }
         .sidebar-header { background: var(--cr-olive); padding: 30px 15px; text-align: center; border-bottom: 2px solid rgba(255,255,255,0.1); }
-        .sidebar-header h5 { color: white; margin: 0; font-weight: 700; letter-spacing: 1px; }
-        #sidebar ul { list-style: none; padding: 0; margin-top: 15px; }
-        #sidebar ul li a { padding: 15px 20px; display: block; color: #a0aec0; text-decoration: none; border-bottom: 1px solid #2d3748; cursor: pointer; transition: all 0.3s ease; border-right: 4px solid transparent; }
-        #sidebar ul li a:hover { background: rgba(85, 107, 47, 0.3); color: white; padding-right: 25px; }
-        #sidebar ul li a.active { background: var(--cr-olive-light); color: white; border-right: 4px solid white; padding-right: 25px; font-weight: 600; box-shadow: inset 0 0 10px rgba(0,0,0,0.2); }
+        .sidebar-header h5 { color: white; margin: 0; font-weight: bold; letter-spacing: 1px; }
+        #sidebar ul { list-style: none; padding: 0; margin-top: 10px; }
+        #sidebar ul li a { padding: 15px 20px; display: block; color: #cbd5e0; text-decoration: none; border-bottom: 1px solid #2d3748; cursor: pointer; transition: 0.3s; }
+        #sidebar ul li a:hover, #sidebar ul li a.active { background: var(--cr-olive); color: white; padding-right: 30px; }
         
-        /* Main Content & Navbar */
-        .content { margin-right: 260px; min-height: 100vh; transition: 0.3s; padding-bottom: 40px; }
-        .top-navbar { background: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 15px rgba(0,0,0,0.05); margin-bottom: 25px; position: sticky; top: 0; z-index: 999; }
+        .content { margin-right: 260px; min-height: 100vh; transition: 0.3s; }
+        .top-navbar { background: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
         
-        /* Buttons UX */
-        .btn-cr { background-color: var(--cr-olive); color: white; border: none; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); font-weight: 600; }
-        .btn-cr:hover { background-color: var(--cr-olive-light); transform: translateY(-2px); box-shadow: 0 4px 10px rgba(61, 73, 40, 0.3); color: white; }
-        .btn-cr:active { transform: scale(0.97); }
+        .btn-cr { background-color: var(--cr-olive); color: white; border: none; transition: 0.3s; }
+        .btn-cr:hover { background-color: var(--cr-olive-light); transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.2); color: white; }
         
-        /* Cards & Containers */
-        .custom-card { background: white; border-radius: 15px; padding: 25px; box-shadow: 0 8px 30px rgba(0,0,0,0.04); margin-bottom: 20px; border: 1px solid var(--cr-border); }
+        .custom-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); margin-bottom: 20px; }
         
-        /* Filters UI */
-        .filter-box { background: white; padding: 20px; border-radius: 12px; border: 1px solid var(--cr-border); margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
-        .filter-label { font-size: 0.8rem; color: #6c757d; margin-bottom: 5px; display: block; font-weight: 700; }
-        .filter-box .form-control, .filter-box .form-select { font-size: 0.9rem; border-radius: 8px; border: 1px solid #ced4da; transition: 0.3s; }
-        .filter-box .form-control:focus, .filter-box .form-select:focus { border-color: var(--cr-olive); box-shadow: 0 0 0 0.2rem rgba(61, 73, 40, 0.25); }
-        
-        /* Tables UI */
-        .table { margin-bottom: 0; }
-        .table th { font-weight: 600; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.5px; border-bottom-width: 2px; }
-        .table-dark th { background-color: var(--cr-olive) !important; border-color: var(--cr-olive-light) !important; }
-        .table-success th { background-color: var(--cr-olive-soft) !important; color: var(--cr-olive) !important; border-color: #dbe4c8 !important; }
-        .table tbody tr { transition: all 0.2s ease; }
-        .table tbody tr:hover { background-color: #f8faf5; transform: scale(1.001); box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        
-        /* Badges & Previews */
-        .ref-badge { font-size: 0.75rem; padding: 4px 10px; border-radius: 6px; background: var(--cr-olive-soft); color: var(--cr-olive); border: 1px solid #dbe4c8; font-weight: 700; letter-spacing: 0.5px; }
-        .names-preview { font-size: 0.8rem; background: #fafbfc; border: 1px solid #f0f0f0; padding: 10px; border-radius: 8px; margin-top: 10px; max-height: 100px; overflow-y: auto; color: #555; line-height: 1.6; text-align: start; }
-        .names-preview strong { color: var(--cr-dark); font-weight: 700; }
-
-        /* Login Page */
         #login-page { height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--cr-dark) 0%, var(--cr-olive) 100%); position: fixed; width: 100%; z-index: 2000; }
-        .login-card { background: white; padding: 50px 40px; border-radius: 20px; width: 100%; max-width: 420px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.4); }
-        .login-card h2 { color: var(--cr-olive); font-weight: 800; margin-bottom: 5px; }
-
-        /* LTR adjustments */
+        .login-card { background: white; padding: 50px; border-radius: 20px; width: 100%; max-width: 450px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+        .login-card h2 { color: var(--cr-olive); font-weight: bold; margin-bottom: 5px; }
+        
         .ltr-mode .content { margin-right: 0; margin-left: 260px; }
         .ltr-mode #sidebar { right: auto; left: 0; }
-        .ltr-mode #sidebar ul li a { border-right: none; border-left: 4px solid transparent; padding-right: 20px; padding-left: 20px; }
-        .ltr-mode #sidebar ul li a:hover { padding-left: 25px; padding-right: 20px; }
-        .ltr-mode #sidebar ul li a.active { border-left: 4px solid white; padding-left: 25px; padding-right: 20px; }
+        .ref-badge { font-size: 0.75rem; padding: 2px 8px; border-radius: 4px; background: #f0f4e8; color: var(--cr-olive); border: 1px solid var(--cr-olive); font-weight: bold; }
+        
+        /* فلاتر مصغرة */
+        .filter-box { background: #f8f9fa; padding: 10px 15px; border-radius: 6px; border: 1px solid #dee2e6; margin-bottom: 15px; }
+        .filter-box .form-control, .filter-box .form-select { font-size: 0.8rem; padding: 4px 8px; height: 32px; }
+        .filter-box .btn { height: 32px; padding: 2px 10px; font-size: 0.85rem; }
+        .filter-label { font-size: 0.75rem; color: #6c757d; margin-bottom: 2px; display: block; font-weight: bold; }
+
+        .names-preview { font-size: 0.75rem; background: #fafafa; border: 1px solid #eee; padding: 8px; border-radius: 6px; margin-top: 8px; max-height: 90px; overflow-y: auto; color: #444; line-height: 1.6; text-align: start; }
+        .names-preview strong { color: var(--cr-olive); }
     </style>
 </head>
 <body class="rtl-mode text-start">
 
     <!-- صفحة تسجيل الدخول -->
     <div id="login-page">
-        <div class="login-card">
+        <div class="login-card shadow-lg">
             <h2>CONTROL RISKS</h2>
             <p class="text-muted mb-4 fw-bold">OFP Application Tracker</p>
             
@@ -89,10 +61,10 @@
             </div>
 
             <form id="loginForm">
-                <div class="mb-3 text-start"><label class="fw-bold small mb-1">اسم المستخدم</label><input type="text" id="user" class="form-control form-control-lg" required></div>
-                <div class="mb-4 text-start"><label class="fw-bold small mb-1">كلمة المرور</label><input type="password" id="pass" class="form-control form-control-lg" required></div>
-                <button type="submit" class="btn btn-cr w-100 p-3 fs-5">تسجيل الدخول</button>
-                <div class="mt-4"><a href="#" class="text-muted small text-decoration-none" onclick="alert('يرجى التواصل مع الدعم التقني: compad.southiraq@controlrisks.com')">نسيت كلمة السر؟</a></div>
+                <div class="mb-3 text-start"><label>اسم المستخدم</label><input type="text" id="user" class="form-control" required></div>
+                <div class="mb-4 text-start"><label>كلمة المرور</label><input type="password" id="pass" class="form-control" required></div>
+                <button type="submit" class="btn btn-cr w-100 p-2 fw-bold">دخول</button>
+                <div class="mt-3"><a href="#" class="text-muted small text-decoration-none" onclick="alert('يرجى التواصل مع: compad.southiraq@controlrisks.com')">نسيت كلمة السر؟</a></div>
             </form>
         </div>
     </div>
@@ -102,162 +74,115 @@
         <nav id="sidebar">
             <div class="sidebar-header"><h5>CONTROL RISKS</h5></div>
             <ul>
-                <li><a onclick="showTab('authorities')" id="link-auth" class="active"><i class="fa fa-building-shield ms-2"></i> الطلبات للهيئات</a></li>
+                <li><a onclick="showTab('authorities')" id="link-auth" class="active"><i class="fa fa-folder-open ms-2"></i> الطلبات للهيئات</a></li>
                 <li><a onclick="showTab('permits')" id="link-permits"><i class="fa fa-id-card-clip ms-2"></i> التصاريح المستلمة</a></li>
                 <li id="admin-menu" style="display: none;"><a onclick="showTab('users')" id="link-users"><i class="fa fa-users-gear ms-2"></i> إدارة الحسابات</a></li>
-                <li><a onclick="logout()"><i class="fa fa-power-off ms-2"></i> تسجيل الخروج</a></li>
+                <li><a onclick="logout()"><i class="fa fa-power-off ms-2"></i> خروج</a></li>
             </ul>
         </nav>
 
         <div class="content">
             <header class="top-navbar">
-                <div><button class="btn btn-sm btn-outline-secondary fw-bold" onclick="toggleLanguage()">EN / AR</button></div>
-                <div>مرحباً: <strong id="user-name" style="color: var(--cr-olive);"></strong> <i class="fa fa-user-circle ms-1"></i></div>
+                <div><button class="btn btn-sm btn-outline-secondary" onclick="toggleLanguage()">EN / AR</button></div>
+                <div>مرحباً: <strong id="user-name" class="text-success"></strong></div>
             </header>
 
-            <div class="px-4">
+            <div class="p-4">
                 <!-- سجل الهيئات -->
                 <div id="authorities-page">
-                    <div class="d-flex justify-content-between mb-3 align-items-center">
-                        <h3 class="fw-bold mb-0 text-dark">سجل الطلبات للهيئات</h3>
-                        <button class="btn btn-cr shadow-sm px-4 py-2" onclick="openModal('auth')"><i class="fa fa-plus me-1"></i> إنشاء طلب جديد</button>
+                    <div class="d-flex justify-content-between mb-2 align-items-center">
+                        <h3 class="fw-bold">سجل الطلبات للهيئات</h3>
+                        <button class="btn btn-cr shadow-sm px-4" onclick="openModal('auth')"><i class="fa fa-plus-circle me-1"></i> إضافة طلب</button>
                     </div>
                     
-                    <!-- الفلاتر المطورة للهيئات -->
-                    <div class="filter-box">
-                        <div class="row g-3 align-items-end">
-                            <div class="col-md-2">
-                                <span class="filter-label">رقم الكتاب</span>
-                                <input type="text" id="f-auth-booknum" class="form-control" placeholder="مثال: 105" onkeyup="render()">
-                            </div>
-                            <div class="col-md-3">
-                                <span class="filter-label">بحث في الأسماء (أجانب/عراقيين/عجلات/أسلحة)</span>
-                                <input type="text" id="f-auth-lists" class="form-control" placeholder="ابحث عن اسم أو رقم..." onkeyup="render()">
-                            </div>
-                            <div class="col-md-2">
-                                <span class="filter-label">رقم المذكرة</span>
-                                <input type="text" id="f-auth-memo" class="form-control" placeholder="رقم المذكرة..." onkeyup="render()">
-                            </div>
-                            <div class="col-md-2">
-                                <span class="filter-label">من تاريخ (إرسال/استلام)</span>
-                                <input type="date" id="f-auth-date-from" class="form-control" onchange="render()">
-                            </div>
-                            <div class="col-md-2">
-                                <span class="filter-label">إلى تاريخ</span>
-                                <input type="date" id="f-auth-date-to" class="form-control" onchange="render()">
-                            </div>
-                            <div class="col-md-1">
-                                <span class="filter-label">الحالة</span>
-                                <select id="f-auth-status" class="form-select" onchange="render()">
-                                    <option value="">الكل</option>
-                                    <option value="Pending">Pending</option>
-                                    <option value="Done">Completed</option>
-                                </select>
-                            </div>
-                            <div class="col-md-12 text-end mt-2">
-                                <button class="btn btn-sm btn-outline-secondary px-4" onclick="clearFilters('auth')"><i class="fa fa-eraser me-1"></i> مسح الفلاتر</button>
-                            </div>
+                    <div class="filter-box row g-2 align-items-end">
+                        <div class="col-md-3"><span class="filter-label">البحث (الاسم / المذكرة)</span><input type="text" id="f-auth-name" class="form-control" placeholder="ابحث هنا..." onkeyup="render()"></div>
+                        <div class="col-md-2"><span class="filter-label">من تاريخ</span><input type="date" id="f-auth-date-from" class="form-control" onchange="render()"></div>
+                        <div class="col-md-2"><span class="filter-label">إلى تاريخ</span><input type="date" id="f-auth-date-to" class="form-control" onchange="render()"></div>
+                        <div class="col-md-2"><span class="filter-label">الحالة</span>
+                            <select id="f-auth-status" class="form-select" onchange="render()">
+                                <option value="">الكل</option><option value="Pending">Pending (معلق)</option><option value="Done">Completed (مكتمل)</option>
+                            </select>
                         </div>
+                        <div class="col-md-1"><button class="btn btn-secondary w-100" onclick="clearFilters('auth')" title="مسح الفلاتر"><i class="fa fa-sync"></i></button></div>
                     </div>
 
                     <div class="custom-card table-responsive">
-                        <table class="table align-middle text-center">
+                        <table class="table table-hover align-middle border text-center">
                             <thead class="table-dark">
                                 <tr>
                                     <th>Ref</th>
-                                    <th style="width: 30%;">اسم الكتاب وتفاصيل القوائم</th>
+                                    <th style="width: 25%;">اسم الكتاب وتفاصيل القوائم</th>
                                     <th>الهيئة / النوع</th>
                                     <th>المذكرة <i class="fa fa-paperclip"></i></th>
                                     <th>إرسال</th>
                                     <th>استلام</th>
+                                    <th>بواسطة</th>
                                     <th>الحالة</th>
                                     <th>الإجراء</th>
                                 </tr>
                             </thead>
                             <tbody id="auth-table-body"></tbody>
                         </table>
-                        <div class="mt-4 text-end">
-                            <button class="btn btn-success btn-sm px-3 shadow-sm" onclick="exportData('auth', 'excel')"><i class="fa fa-file-excel me-1"></i> تصدير Excel</button>
-                            <button class="btn btn-secondary btn-sm px-3 shadow-sm" onclick="exportData('auth', 'csv')"><i class="fa fa-file-csv me-1"></i> تصدير CSV</button>
+                        <div class="mt-3 text-end">
+                            <button class="btn btn-success btn-sm" onclick="exportData('auth', 'excel')"><i class="fa fa-file-excel"></i> Excel</button>
+                            <button class="btn btn-secondary btn-sm" onclick="exportData('auth', 'csv')"><i class="fa fa-file-csv"></i> CSV</button>
                         </div>
                     </div>
                 </div>
 
                 <!-- سجل التصاريح -->
                 <div id="permits-page" style="display: none;">
-                    <div class="d-flex justify-content-between mb-3 align-items-center">
-                        <h3 class="fw-bold mb-0" style="color: var(--cr-olive);">سجل التصاريح المستلمة</h3>
-                    </div>
+                    <h3 class="fw-bold mb-2" style="color: var(--cr-olive);">سجل التصاريح المستلمة</h3>
                     
-                    <!-- الفلاتر المطورة للتصاريح -->
-                    <div class="filter-box">
-                        <div class="row g-3 align-items-end">
-                            <div class="col-md-2">
-                                <span class="filter-label">رقم الكتاب</span>
-                                <input type="text" id="f-perm-booknum" class="form-control" placeholder="رقم الكتاب..." onkeyup="render()">
-                            </div>
-                            <div class="col-md-3">
-                                <span class="filter-label">بحث في الأسماء (أجانب/عراقيين/عجلات/أسلحة)</span>
-                                <input type="text" id="f-perm-lists" class="form-control" placeholder="ابحث عن اسم أو رقم..." onkeyup="render()">
-                            </div>
-                            <div class="col-md-2">
-                                <span class="filter-label">OFP / المذكرة</span>
-                                <input type="text" id="f-perm-ofp-memo" class="form-control" placeholder="ابحث..." onkeyup="render()">
-                            </div>
-                            <div class="col-md-2">
-                                <span class="filter-label">من تاريخ</span>
-                                <input type="date" id="f-perm-date-from" class="form-control" onchange="render()">
-                            </div>
-                            <div class="col-md-2">
-                                <span class="filter-label">إلى تاريخ</span>
-                                <input type="date" id="f-perm-date-to" class="form-control" onchange="render()">
-                            </div>
-                            <div class="col-md-1">
-                                <span class="filter-label">الحالة</span>
-                                <select id="f-perm-status" class="form-select" onchange="render()">
-                                    <option value="">الكل</option>
-                                    <option value="Pending">Pending</option>
-                                    <option value="Completed">Completed</option>
-                                </select>
-                            </div>
-                            <div class="col-md-12 text-end mt-2">
-                                <button class="btn btn-sm btn-outline-secondary px-4" onclick="clearFilters('perm')"><i class="fa fa-eraser me-1"></i> مسح الفلاتر</button>
-                            </div>
+                    <div class="filter-box row g-2 align-items-end">
+                        <div class="col-md-3"><span class="filter-label">البحث (الاسم / OFP / المذكرة)</span><input type="text" id="f-perm-name" class="form-control" placeholder="ابحث هنا..." onkeyup="render()"></div>
+                        <div class="col-md-2"><span class="filter-label">من تاريخ</span><input type="date" id="f-perm-date-from" class="form-control" onchange="render()"></div>
+                        <div class="col-md-2"><span class="filter-label">إلى تاريخ</span><input type="date" id="f-perm-date-to" class="form-control" onchange="render()"></div>
+                        <div class="col-md-2"><span class="filter-label">الحالة</span>
+                            <select id="f-perm-status" class="form-select" onchange="render()">
+                                <option value="">الكل</option><option value="Pending">Pending</option><option value="Completed">Completed</option>
+                            </select>
                         </div>
+                        <div class="col-md-1"><button class="btn btn-secondary w-100" onclick="clearFilters('perm')" title="مسح الفلاتر"><i class="fa fa-sync"></i></button></div>
                     </div>
 
                     <div class="custom-card table-responsive">
-                        <table class="table align-middle text-center">
+                        <table class="table table-bordered align-middle border text-center">
                             <thead class="table-success">
                                 <tr>
                                     <th>Ref / OFP</th>
-                                    <th style="width: 30%;">التصريح الجديد والتفاصيل</th>
+                                    <th style="width: 25%;">التصريح الجديد والتفاصيل</th>
                                     <th>الهيئة / النوع</th>
                                     <th>المذكرة <i class="fa fa-paperclip"></i></th>
-                                    <th>إرسال</th><th>استلام</th><th>الحالة</th><th>إجراء</th>
+                                    <th>إرسال</th>
+                                    <th>استلام</th>
+                                    <th>بواسطة</th>
+                                    <th>الحالة</th>
+                                    <th>إجراء</th>
                                 </tr>
                             </thead>
                             <tbody id="permits-table-body"></tbody>
                         </table>
-                        <div class="mt-4 text-end">
-                            <button class="btn btn-success btn-sm px-3 shadow-sm" onclick="exportData('permits', 'excel')"><i class="fa fa-file-excel me-1"></i> تصدير Excel</button>
-                            <button class="btn btn-secondary btn-sm px-3 shadow-sm" onclick="exportData('permits', 'csv')"><i class="fa fa-file-csv me-1"></i> تصدير CSV</button>
+                        <div class="mt-3 text-end">
+                            <button class="btn btn-success btn-sm" onclick="exportData('permits', 'excel')"><i class="fa fa-file-excel"></i> Excel</button>
+                            <button class="btn btn-secondary btn-sm" onclick="exportData('permits', 'csv')"><i class="fa fa-file-csv"></i> CSV</button>
                         </div>
                     </div>
                 </div>
 
                 <!-- إدارة الحسابات -->
                 <div id="users-page" style="display: none;">
-                    <h3 class="fw-bold mb-4 text-dark">إدارة الحسابات</h3>
+                    <h3 class="fw-bold mb-4">إدارة الحسابات</h3>
                     <div class="custom-card">
-                        <div class="row g-3 mb-4 text-start bg-light p-3 rounded border">
+                        <div class="row g-3 mb-4 text-start">
                             <input type="hidden" id="edit-user-index" value="-1">
-                            <div class="col-md-4"><label class="fw-bold small mb-1">اسم المستخدم</label><input id="nu" class="form-control"></div>
-                            <div class="col-md-4"><label class="fw-bold small mb-1">كلمة المرور</label><input id="np" class="form-control"></div>
-                            <div class="col-md-4 d-flex align-items-end"><button id="btn-save-user" class="btn btn-cr w-100 fw-bold" onclick="addUser()">إضافة حساب</button></div>
+                            <div class="col-md-4"><label>اسم المستخدم</label><input id="nu" class="form-control"></div>
+                            <div class="col-md-4"><label>الباسورد</label><input id="np" class="form-control"></div>
+                            <div class="col-md-4 d-flex align-items-end"><button id="btn-save-user" class="btn btn-success w-100 fw-bold" onclick="addUser()">إضافة حساب</button></div>
                         </div>
-                        <table class="table table-striped border text-center">
-                            <thead class="table-dark"><tr><th>المستخدم</th><th>كلمة المرور</th><th>الرتبة</th><th>الإجراءات</th></tr></thead>
+                        <table class="table table-striped table-bordered text-center">
+                            <thead class="table-dark"><tr><th>المستخدم</th><th>الباسورد</th><th>الرتبة</th><th>الإجراءات</th></tr></thead>
                             <tbody id="utb"></tbody>
                         </table>
                     </div>
@@ -269,43 +194,38 @@
     <!-- Modal Form -->
     <div class="modal fade" id="mainModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-xl">
-            <div class="modal-content text-start border-0 shadow-lg">
-                <div class="modal-header text-white" style="background-color: var(--cr-olive);"><h5 class="modal-title fw-bold">بيانات الطلب</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
-                <div class="modal-body p-4">
+            <div class="modal-content text-start">
+                <div class="modal-header bg-dark text-white"><h5 class="modal-title">بيانات الطلب</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body">
                     <form id="orderForm">
                         <input type="hidden" id="edit-id"><input type="hidden" id="form-type">
                         <div class="row g-3">
-                            <div class="col-md-3"><label class="fw-bold small">رقم الكتاب</label><input type="text" id="f-bn" class="form-control" required placeholder="مثال: 105"></div>
-                            <div class="col-md-3"><label class="fw-bold small">نوع التصريح</label><select id="f-pt" class="form-select"><option value="مؤقت">مؤقت</option><option value="دائمي">دائمي</option></select></div>
-                            <div class="col-md-3"><label class="fw-bold small">الهيئة</label><select id="f-ta" class="form-select"><option value="BGC">BGC</option><option value="ROO">ROO</option><option value="SRC">SRC</option></select></div>
-                            <div class="col-md-3" id="ofp-container"><label class="fw-bold small text-primary">OFP Number</label><input type="text" id="f-ofp" class="form-control"></div>
+                            <div class="col-md-3"><label>رقم الكتاب</label><input type="text" id="f-bn" class="form-control" required></div>
+                            <div class="col-md-3"><label>نوع التصريح</label><select id="f-pt" class="form-select"><option value="مؤقت">مؤقت</option><option value="دائمي">دائمي</option></select></div>
+                            <div class="col-md-3"><label>الهيئة</label><select id="f-ta" class="form-select"><option value="BGC">BGC</option><option value="ROO">ROO</option><option value="SRC">SRC</option></select></div>
+                            <div class="col-md-3" id="ofp-container"><label>OFP Number</label><input type="text" id="f-ofp" class="form-control"></div>
                             
-                            <div class="col-md-3"><label class="fw-bold small">تاريخ الإرسال</label><input type="date" id="f-sd" class="form-control"></div>
-                            <div class="col-md-3"><label class="fw-bold small">تاريخ الاستلام</label><input type="date" id="f-rd" class="form-control"></div>
-                            <div class="col-md-3"><label class="fw-bold small">رقم المذكرة</label><input type="text" id="f-memo" class="form-control"></div>
+                            <div class="col-md-3"><label>تاريخ الإرسال</label><input type="date" id="f-sd" class="form-control"></div>
+                            <div class="col-md-3"><label>تاريخ الاستلام</label><input type="date" id="f-rd" class="form-control"></div>
+                            <div class="col-md-3"><label>رقم المذكرة</label><input type="text" id="f-memo" class="form-control"></div>
                             <div class="col-md-3">
-                                <label class="fw-bold small">مرفق المذكرة (PDF/Image)</label>
+                                <label>مرفق المذكرة (اختياري)</label>
                                 <input type="file" id="f-file" class="form-control" accept=".pdf, image/*">
                             </div>
 
-                            <div class="col-12 mt-4"><div class="alert alert-secondary border small text-center fw-bold"><i class="fa fa-info-circle me-1"></i> يمكنك نسخ القوائم من الوورد ولصقها مباشرة في الخانات أدناه (كل اسم في سطر)</div></div>
-                            
-                            <div class="col-md-3"><label class="fw-bold small text-muted"><i class="fa fa-car"></i> العجلات</label><textarea id="f-w" class="form-control" rows="4"></textarea></div>
-                            <div class="col-md-3"><label class="fw-bold small text-muted"><i class="fa fa-user"></i> الأجانب</label><textarea id="f-e" class="form-control" rows="4"></textarea></div>
-                            <div class="col-md-3"><label class="fw-bold small text-muted"><i class="fa fa-user-tie"></i> العراقيين</label><textarea id="f-l" class="form-control" rows="4"></textarea></div>
-                            <div class="col-md-3"><label class="fw-bold small text-muted"><i class="fa fa-gun"></i> الأسلحة</label><textarea id="f-wp" class="form-control" rows="4"></textarea></div>
+                            <div class="col-12"><div class="alert alert-light border small text-center mt-2">انسخ القوائم من الوورد مباشرة في الخانات أدناه</div></div>
+                            <div class="col-md-3"><label>العجلات</label><textarea id="f-w" class="form-control" rows="3"></textarea></div>
+                            <div class="col-md-3"><label>الأجانب</label><textarea id="f-e" class="form-control" rows="3"></textarea></div>
+                            <div class="col-md-3"><label>العراقيين</label><textarea id="f-l" class="form-control" rows="3"></textarea></div>
+                            <div class="col-md-3"><label>الأسلحة</label><textarea id="f-wp" class="form-control" rows="3"></textarea></div>
                         </div>
-                        <div class="mt-4 text-end">
-                            <button type="button" class="btn btn-light px-4 border" data-bs-dismiss="modal">إلغاء</button>
-                            <button type="submit" class="btn btn-cr px-5 ms-2">حفظ وتأكيد</button>
-                        </div>
+                        <button type="submit" class="btn btn-cr w-100 mt-4 p-2 fw-bold">حفظ البيانات</button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         let authoritiesData = JSON.parse(localStorage.getItem('auth_data')) || [];
@@ -325,6 +245,7 @@
         function toggleLanguage() {
             currentLang = currentLang === 'ar' ? 'en' : 'ar';
             document.getElementById('html-tag').dir = currentLang === 'en' ? 'ltr' : 'rtl';
+            document.getElementById('bootstrap-rtl').href = currentLang === 'en' ? "https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" : "https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css";
             document.body.className = currentLang === 'en' ? 'ltr-mode text-start' : 'rtl-mode text-start';
         }
 
@@ -421,9 +342,7 @@
                         permitsData[pIdx].bn = `ISCO - ${permitsData[pIdx].bn_orig || ""} - ${entry.pt} - ${countStr}`;
                         permitsData[pIdx].fileData = entry.fileData;
                     }
-                } else {
-                    authoritiesData.push(entry);
-                }
+                } else authoritiesData.push(entry);
 
                 if(entry.status === 'Done') {
                     const exist = permitsData.find(p => p.sysRef === entry.sysRef);
@@ -452,19 +371,11 @@
 
         function clearFilters(type) {
             if(type === 'auth') {
-                document.getElementById('f-auth-booknum').value = '';
-                document.getElementById('f-auth-lists').value = '';
-                document.getElementById('f-auth-memo').value = '';
-                document.getElementById('f-auth-date-from').value = '';
-                document.getElementById('f-auth-date-to').value = '';
-                document.getElementById('f-auth-status').value = '';
+                document.getElementById('f-auth-name').value = ''; document.getElementById('f-auth-memo').value = '';
+                document.getElementById('f-auth-date-from').value = ''; document.getElementById('f-auth-date-to').value = ''; document.getElementById('f-auth-status').value = '';
             } else {
-                document.getElementById('f-perm-booknum').value = '';
-                document.getElementById('f-perm-lists').value = '';
-                document.getElementById('f-perm-ofp-memo').value = '';
-                document.getElementById('f-perm-date-from').value = '';
-                document.getElementById('f-perm-date-to').value = '';
-                document.getElementById('f-perm-status').value = '';
+                document.getElementById('f-perm-name').value = ''; document.getElementById('f-perm-ofp').value = '';
+                document.getElementById('f-perm-memo').value = ''; document.getElementById('f-perm-date-from').value = ''; document.getElementById('f-perm-date-to').value = ''; document.getElementById('f-perm-status').value = '';
             }
             render();
         }
@@ -489,18 +400,14 @@
 
         function render() {
             // Filters Auth
-            const fAuthBookNum = document.getElementById('f-auth-booknum').value.toLowerCase();
-            const fAuthLists = document.getElementById('f-auth-lists').value.toLowerCase();
+            const fAuthName = document.getElementById('f-auth-name').value.toLowerCase();
             const fAuthMemo = document.getElementById('f-auth-memo').value.toLowerCase();
             const fAuthDateFrom = document.getElementById('f-auth-date-from').value;
             const fAuthDateTo = document.getElementById('f-auth-date-to').value;
             const fAuthStatus = document.getElementById('f-auth-status').value;
 
             const filteredAuth = authoritiesData.filter(i => {
-                const matchBookNum = (i.bn_orig || '').toLowerCase().includes(fAuthBookNum);
-                const matchLists = fAuthLists === '' || [...i.w, ...i.e, ...i.l, ...i.wp].some(val => val.toLowerCase().includes(fAuthLists));
-                const matchMemo = (i.memo || '').toLowerCase().includes(fAuthMemo);
-                
+                const searchStr = (i.bn + " " + (i.memo||'')).toLowerCase();
                 let dateValid = true;
                 if(fAuthDateFrom || fAuthDateTo) {
                     const sd = i.sd ? new Date(i.sd) : null; const rd = i.rd ? new Date(i.rd) : null;
@@ -508,9 +415,7 @@
                     const dTo = fAuthDateTo ? new Date(fAuthDateTo) : new Date('2100-01-01');
                     dateValid = (sd && sd >= dFrom && sd <= dTo) || (rd && rd >= dFrom && rd <= dTo);
                 }
-                const matchStatus = fAuthStatus ? (i.status === fAuthStatus) : true;
-                
-                return matchBookNum && matchLists && matchMemo && dateValid && matchStatus;
+                return searchStr.includes(fAuthName) && dateValid && (fAuthStatus ? i.status === fAuthStatus : true);
             });
 
             const ab = document.getElementById('auth-table-body'); ab.innerHTML = '';
@@ -525,6 +430,7 @@
                     <td class="fw-bold">${i.memo || '-'}${fileIcon}</td>
                     <td><small>${i.sd || '-'}</small></td>
                     <td><small>${i.rd || '-'}</small></td>
+                    <td><span class="badge bg-light text-dark border"><i class="fa fa-user me-1"></i> ${i.creator}</span></td>
                     <td>${statusBadge}</td>
                     <td>
                         <div class="btn-group shadow-sm">
@@ -536,18 +442,15 @@
             });
 
             // Filters Permits
-            const fPermBookNum = document.getElementById('f-perm-booknum').value.toLowerCase();
-            const fPermLists = document.getElementById('f-perm-lists').value.toLowerCase();
-            const fPermOfpMemo = document.getElementById('f-perm-ofp-memo').value.toLowerCase();
+            const fPermName = document.getElementById('f-perm-name').value.toLowerCase();
+            const fPermOfp = document.getElementById('f-perm-ofp').value.toLowerCase();
+            const fPermMemo = document.getElementById('f-perm-memo').value.toLowerCase();
             const fPermDateFrom = document.getElementById('f-perm-date-from').value;
             const fPermDateTo = document.getElementById('f-perm-date-to').value;
             const fPermStatus = document.getElementById('f-perm-status').value;
 
             const filteredPerm = permitsData.filter(i => {
-                const matchBookNum = (i.bn_orig || '').toLowerCase().includes(fPermBookNum);
-                const matchLists = fPermLists === '' || [...i.w, ...i.e, ...i.l, ...i.wp].some(val => val.toLowerCase().includes(fPermLists));
-                const matchOfpMemo = ((i.ofp || '') + " " + (i.memo || '')).toLowerCase().includes(fPermOfpMemo);
-                
+                const searchStr = (i.bn + " " + (i.ofp||'') + " " + (i.memo||'')).toLowerCase();
                 let dateValid = true;
                 if(fPermDateFrom || fPermDateTo) {
                     const sd = i.sd ? new Date(i.sd) : null; const rd = i.rd ? new Date(i.rd) : null;
@@ -555,9 +458,7 @@
                     const dTo = fPermDateTo ? new Date(fPermDateTo) : new Date('2100-01-01');
                     dateValid = (sd && sd >= dFrom && sd <= dTo) || (rd && rd >= dFrom && rd <= dTo);
                 }
-                const matchStatus = fPermStatus ? (i.status === fPermStatus) : true;
-
-                return matchBookNum && matchLists && matchOfpMemo && dateValid && matchStatus;
+                return searchStr.includes(fPermName) && dateValid && (fPermStatus ? i.status === fPermStatus : true);
             });
 
             const pb = document.getElementById('permits-table-body'); pb.innerHTML = '';
@@ -572,6 +473,7 @@
                     <td class="fw-bold">${i.memo || '-'}${fileIcon}</td>
                     <td><small>${i.sd || '-'}</small></td>
                     <td><small>${i.rd || '-'}</small></td>
+                    <td><span class="badge bg-light text-dark border"><i class="fa fa-user me-1"></i> ${i.creator}</span></td>
                     <td>${s}</td>
                     <td>
                         <div class="btn-group shadow-sm">
