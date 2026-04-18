@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Control Risks | OFP Tracker PRO</title>
+    <!-- Bootstrap & Fonts -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" id="bootstrap-rtl">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -62,7 +63,7 @@
         <div class="login-card shadow-lg">
             <h2>CONTROL RISKS</h2>
             <p class="text-muted mb-4 fw-bold">OFP Application Tracker</p>
-            <div id="login-error" class="alert alert-danger p-2 small fw-bold d-none"><i class="fa fa-exclamation-circle"></i> اليوزر أو الرمز خطأ.</div>
+            <div id="login-error" class="alert alert-danger p-2 small fw-bold" style="display: none;"><i class="fa fa-exclamation-circle"></i> اليوزر أو الرمز خطأ.</div>
             <div class="mb-3 text-start"><label class="fw-bold small">اسم المستخدم</label><input type="text" id="userInput" class="form-control form-control-lg"></div>
             <div class="mb-4 text-start"><label class="fw-bold small">كلمة المرور</label><input type="password" id="passInput" class="form-control form-control-lg" onkeypress="if(event.key === 'Enter') loginSystem()"></div>
             <button onclick="loginSystem()" class="btn btn-cr w-100 p-3 fs-5">دخول</button>
@@ -140,7 +141,7 @@
                     </div>
                     <div class="custom-card table-responsive">
                         <table class="table table-bordered align-middle text-center">
-                            <thead class="table-success"><tr><th>Ref/OFP</th><th style="width:25%;">التصريح والأسماء</th><th>الهيئة/النوع</th><th>المذكرة</th><th>إرسال</th><th>استلام</th><th>بواسطة</th><th>الحالة</th><th>إجراء</th></tr></thead>
+                            <thead class="table-success text-dark"><tr><th>Ref/OFP</th><th style="width:25%;">التصريح والأسماء</th><th>الهيئة/النوع</th><th>المذكرة</th><th>إرسال</th><th>استلام</th><th>بواسطة</th><th>الحالة</th><th>إجراء</th></tr></thead>
                             <tbody id="perm-body"></tbody>
                         </table>
                         <nav class="mt-3 d-flex justify-content-between align-items-center">
@@ -203,29 +204,30 @@
         </div>
     </div>
 
-    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         let authData = JSON.parse(localStorage.getItem('CR_AUTH')) || [];
         let permData = JSON.parse(localStorage.getItem('CR_PERM')) || [];
         let users = JSON.parse(localStorage.getItem('CR_USERS')) || [{u:'admin', p:'1234', r:'admin'}];
-        let readNotifs = JSON.parse(localStorage.getItem('CR_NOTIFS')) || {};
+        
+        // مصفوفة مؤقتة (Session) لحفظ الإشعارات المقروءة لكل تسجيل دخول
+        let sessionReadNotifs = []; 
         let currentUser = null; let lang = 'ar';
         const modal = new bootstrap.Modal(document.getElementById('mainModal'));
         
         let currPageAuth = 1; let currPagePerm = 1; const rowsPerPage = 15;
 
-        // دالة قوية للتأكد من مسح الإشعارات فور النقر على زر الجرس (Event Listener مستقل)
+        // مستمع زر الجرس
         document.addEventListener('DOMContentLoaded', () => {
             const bellBtn = document.getElementById('bell-btn');
             if(bellBtn) {
                 bellBtn.addEventListener('click', function() {
                     if(!currentUser) return;
                     
-                    // 1. إخفاء العداد فوراً وبشكل حاسم من واجهة المستخدم
+                    // إخفاء العداد فوراً
                     document.getElementById('notif-count').classList.add('d-none');
                     
-                    // 2. تحديث قاعدة بيانات الإشعارات للمستخدم الحالي
+                    // تسجيل كافة الإشعارات الحالية كمقروءة في هذه الجلسة فقط
                     const today = new Date();
                     today.setHours(0,0,0,0);
 
@@ -236,15 +238,12 @@
                             const daysLeft = 21 - diffDays;
 
                             if(daysLeft <= 10 && daysLeft >= 0) {
-                                if(!readNotifs[currentUser.u].includes(p.id)) {
-                                    readNotifs[currentUser.u].push(p.id);
+                                if(!sessionReadNotifs.includes(p.id)) {
+                                    sessionReadNotifs.push(p.id);
                                 }
                             }
                         }
                     });
-                    
-                    // 3. حفظ الذاكرة بصمت
-                    localStorage.setItem('CR_NOTIFS', JSON.stringify(readNotifs));
                 });
             }
         });
@@ -254,7 +253,6 @@
                 localStorage.setItem('CR_AUTH', JSON.stringify(authData)); 
                 localStorage.setItem('CR_PERM', JSON.stringify(permData)); 
                 localStorage.setItem('CR_USERS', JSON.stringify(users)); 
-                localStorage.setItem('CR_NOTIFS', JSON.stringify(readNotifs)); 
             } catch(e) { alert("⚠️ الذاكرة ممتلئة! يرجى حذف بعض الملفات المرفقة."); }
         }
 
@@ -263,14 +261,16 @@
             const f = users.find(x => x.u === u && x.p === p);
             if(f) {
                 currentUser = f; 
+                sessionReadNotifs = []; // تصفير قائمة المقروءة عند كل دخول جديد
+                
                 document.getElementById('login-page').style.display = 'none'; 
                 document.getElementById('main-dashboard').style.display = 'block';
                 document.getElementById('user-display').innerText = f.u; 
                 if(f.r === 'admin') document.getElementById('admin-menu').style.display = 'block';
-                if(!readNotifs[currentUser.u]) readNotifs[currentUser.u] = [];
+                
                 render(); checkNotifications();
             } else {
-                document.getElementById('login-error').classList.remove('d-none');
+                document.getElementById('login-error').style.display = 'block';
             }
         }
 
@@ -281,7 +281,7 @@
             document.getElementById('link-'+t).classList.add('active');
         }
 
-        function logout() { location.reload(); }
+        function logout() { location.reload(); } // الريفريش كفيل بمسح الجلسة (Session)
 
         function openModal(type, id = null) {
             document.getElementById('m-bn').value=""; document.getElementById('m-pt').value="مؤقت"; document.getElementById('m-ta').value="BGC"; document.getElementById('m-memo').value=""; 
@@ -333,11 +333,8 @@
             saveToStorage(); render(); checkNotifications(); modal.hide();
         }
 
-        // بناء وعرض الإشعارات بدقة
         function checkNotifications() {
             if(!currentUser) return;
-            if(!readNotifs[currentUser.u]) readNotifs[currentUser.u] = [];
-
             let alerts = []; let unreadCount = 0; 
             const today = new Date();
             today.setHours(0,0,0,0);
@@ -351,7 +348,7 @@
                     
                     if(daysLeft <= 10 && daysLeft >= 0) {
                         alerts.push({id: p.id, bn: p.full_bn, left: daysLeft});
-                        if(!readNotifs[currentUser.u].includes(p.id)) {
+                        if(!sessionReadNotifs.includes(p.id)) {
                             unreadCount++;
                         }
                     }
@@ -361,7 +358,7 @@
             const badge = document.getElementById('notif-count'); 
             const list = document.getElementById('notif-list');
             
-            list.innerHTML = ''; // مسح القائمة القديمة
+            list.innerHTML = ''; 
 
             if(alerts.length > 0) {
                 if(unreadCount > 0) { 
@@ -425,7 +422,7 @@
             paginatedAuth.forEach(i => {
                 const sBadge = i.status==='Done'?'<span class="badge bg-success">Completed</span>':'<span class="badge bg-warning text-dark">Pending</span>';
                 const fileIco = i.file?`<a href="#" onclick="openFile('${i.file}')" class="text-danger ms-1"><i class="fa fa-paperclip fa-lg"></i></a>`:'';
-                ab.innerHTML += `<tr><td><span class="badge bg-secondary shadow-sm">${i.ref}</span></td><td class="text-start"><span class="fw-bold" style="color:var(--cr-olive);">${i.full_bn}</span>${generateNamesPreview(i)}</td><td><span class="badge bg-dark">${i.ta}</span><br><small class="fw-bold text-muted">${i.pt}</small></td><td class="fw-bold">${i.memo||'-'}${fileIco}</td><td><small>${i.sd||'-'}</small></td><td><small>${i.rd||'-'}</small></td><td><span class="badge bg-light text-dark border"><i class="fa fa-user me-1"></i> ${i.creator}</span></td><td>${sBadge}</td><td><div class="btn-group"><button class="btn btn-sm btn-light border" onclick="openModal('auth',${i.id})"><i class="fa fa-edit text-primary"></i></button><button class="btn btn-sm btn-light border" onclick="deleteRec('auth',${i.id})"><i class="fa fa-trash text-danger"></i></button></div></td></tr>`;
+                ab.innerHTML += `<tr><td><span class="badge bg-secondary shadow-sm">${i.ref}</span></td><td class="text-start"><strong style="color:var(--cr-olive);">${i.full_bn}</strong>${generateNamesPreview(i)}</td><td><span class="badge bg-dark">${i.ta}</span><br><small class="fw-bold text-muted">${i.pt}</small></td><td class="fw-bold">${i.memo||'-'}${fileIco}</td><td><small>${i.sd||'-'}</small></td><td><small>${i.rd||'-'}</small></td><td><span class="badge bg-light text-dark border"><i class="fa fa-user me-1"></i> ${i.creator}</span></td><td>${sBadge}</td><td><div class="btn-group"><button class="btn btn-sm btn-light border" onclick="openModal('auth',${i.id})"><i class="fa fa-edit text-primary"></i></button><button class="btn btn-sm btn-light border" onclick="deleteRec('auth',${i.id})"><i class="fa fa-trash text-danger"></i></button></div></td></tr>`;
             });
             renderPagination(fAuth.length, currPageAuth, 'auth');
 
@@ -436,7 +433,7 @@
             paginatedPerm.forEach(i => {
                 const sBadge = i.status==='Completed'?'<span class="badge bg-success">Completed</span>':'<span class="badge bg-warning text-dark">Pending</span>';
                 const fileIco = i.file?`<a href="#" onclick="openFile('${i.file}')" class="text-danger ms-1"><i class="fa fa-paperclip fa-lg"></i></a>`:'';
-                pb.innerHTML += `<tr><td><span class="badge bg-secondary shadow-sm mb-1">${i.ref}</span><br><strong class="text-primary small">${i.ofp||'-'}</strong></td><td class="text-start"><span class="fw-bold" style="color:var(--cr-olive);">${i.full_bn}</span>${generateNamesPreview(i)}</td><td><span class="badge bg-dark">${i.ta}</span><br><small class="fw-bold text-muted">${i.pt}</small></td><td class="fw-bold">${i.memo||'-'}${fileIco}</td><td><small>${i.sd||'-'}</small></td><td><small>${i.rd||'-'}</small></td><td><span class="badge bg-light text-dark border"><i class="fa fa-user me-1"></i> ${i.creator}</span></td><td>${sBadge}</td><td><div class="btn-group"><button class="btn btn-sm btn-light border" onclick="openModal('permits',${i.id})"><i class="fa fa-edit text-primary"></i></button><button class="btn btn-sm btn-light border" onclick="deleteRec('perm',${i.id})"><i class="fa fa-trash text-danger"></i></button></div></td></tr>`;
+                pb.innerHTML += `<tr><td><span class="badge bg-secondary shadow-sm mb-1">${i.ref}</span><br><strong class="text-primary small">${i.ofp||'-'}</strong></td><td class="text-start"><strong style="color:var(--cr-olive);">${i.full_bn}</strong>${generateNamesPreview(i)}</td><td><span class="badge bg-dark">${i.ta}</span><br><small class="fw-bold text-muted">${i.pt}</small></td><td class="fw-bold">${i.memo||'-'}${fileIco}</td><td><small>${i.sd||'-'}</small></td><td><small>${i.rd||'-'}</small></td><td><span class="badge bg-light text-dark border"><i class="fa fa-user me-1"></i> ${i.creator}</span></td><td>${sBadge}</td><td><div class="btn-group"><button class="btn btn-sm btn-light border" onclick="openModal('permits',${i.id})"><i class="fa fa-edit text-primary"></i></button><button class="btn btn-sm btn-light border" onclick="deleteRec('perm',${i.id})"><i class="fa fa-trash text-danger"></i></button></div></td></tr>`;
             });
             renderPagination(fPerm.length, currPagePerm, 'permits');
             renderUsers();
@@ -452,7 +449,7 @@
         }
         function editUser(i) { document.getElementById('nu').value=users[i].u; document.getElementById('np').value=users[i].p; document.getElementById('edit-user-idx').value=i; document.getElementById('btn-save-user').innerText="تحديث"; }
         function handleUser() { const u=document.getElementById('nu').value, p=document.getElementById('np').value, idx=parseInt(document.getElementById('edit-user-idx').value); if(!u||!p) return; if(idx!==-1){ users[idx].u=u; users[idx].p=p; document.getElementById('edit-user-idx').value=-1; document.getElementById('btn-save-user').innerText="إضافة"; } else users.push({u,p,r:'user'}); document.getElementById('nu').value=''; document.getElementById('np').value=''; saveToStorage(); render(); }
-        function exportData(t) { const d = t==='auth'?authData:permData; const ws = XLSX.utils.json_to_sheet(d.map(i=>({ Ref: i.ref, Book_No: i.bn_orig, Full_Name: i.full_bn, Authority: i.ta, Type: i.pt, Memo: i.memo||'', OFP: i.ofp||'', Sent: i.sd||'', Received: i.rd||'', Status: i.status, Creator: i.creator, Wheels: i.w.join(' | '), Expats: i.e.join(' | '), Locals: i.l.join(' | '), Weapons: i.wp.join(' | ') }))); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Data"); XLSX.writeFile(wb, `CR_${t}.xlsx`); }
+        function exportData(t) { const d = t==='auth'?authData:permData; const ws = XLSX.utils.json_to_sheet(d.map(i=>({ Ref: i.ref, Book_No: i.bn_orig, Full_Name: i.full_bn, Authority: i.ta, Type: i.pt, Memo: i.memo||'', OFP: i.ofp||'', Sent: i.sd||'', Received: i.rd||'', Status: i.status, Creator: i.creator, Wheels: i.w.join(' | '), Expats: i.e.join(' | '), Locals: i.l.join(' | '), Weapons: i.wp.join(' | ') }))); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Data"); XLSX.writeFile(wb, `ControlRisks_${t}.xlsx`); }
         function toggleLanguage() { lang = lang==='ar'?'en':'ar'; document.getElementById('html-tag').dir = lang==='en'?'ltr':'rtl'; document.body.className = lang==='en'?'ltr-mode text-start':'rtl-mode text-start'; }
     </script>
 </body>
