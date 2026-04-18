@@ -89,11 +89,11 @@
                     <button class="btn btn-sm btn-outline-secondary fw-bold ms-3" onclick="toggleLanguage()">EN / AR</button>
                     <!-- الإشعارات -->
                     <div class="dropdown">
-                        <button class="btn btn-light position-relative border" data-bs-toggle="dropdown" aria-expanded="false" onclick="markNotificationsAsRead()">
+                        <button class="btn btn-light position-relative border" data-bs-toggle="dropdown" aria-expanded="false" onclick="openNotifications()">
                             <i class="fa fa-bell text-warning fs-5"></i>
-                            <span id="notif-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none">0</span>
+                            <span id="notif-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display: none;">0</span>
                         </button>
-                        <ul id="notif-list" class="dropdown-menu notification-dropdown p-0">
+                        <ul id="notif-list" class="dropdown-menu notification-dropdown text-end p-0">
                             <li class="p-3 text-center text-muted small fw-bold">لا توجد تصاريح قريبة الانتهاء</li>
                         </ul>
                     </div>
@@ -191,7 +191,7 @@
                         <div class="col-md-3"><label class="fw-bold small">إرسال</label><input type="date" id="m-sd" class="form-control"></div>
                         <div class="col-md-3"><label class="fw-bold small">استلام</label><input type="date" id="m-rd" class="form-control"></div>
                         <div class="col-md-3"><label class="fw-bold small">رقم المذكرة</label><input type="text" id="m-memo" class="form-control"></div>
-                        <div class="col-md-3"><label class="fw-bold small">مرفق (اختياري)</label><input type="file" id="m-file" class="form-control" accept=".pdf, image/*"></div>
+                        <div class="col-md-3"><label class="fw-bold small">مرفق (اختياري)</label><input type="file" id="m-file" class="form-control"></div>
                         <div class="col-12 mt-4"><div class="alert alert-secondary border small text-center fw-bold">انسخ القوائم من الوورد والصقها مباشرة هنا</div></div>
                         <div class="col-md-3"><label class="fw-bold small">العجلات</label><textarea id="m-w" class="form-control" rows="4"></textarea></div>
                         <div class="col-md-3"><label class="fw-bold small">الأجانب</label><textarea id="m-e" class="form-control" rows="4"></textarea></div>
@@ -210,6 +210,7 @@
         let permData = JSON.parse(localStorage.getItem('CR_PERM')) || [];
         let users = JSON.parse(localStorage.getItem('CR_USERS')) || [{u:'admin', p:'1234', r:'admin'}];
         let readNotifs = JSON.parse(localStorage.getItem('CR_NOTIFS')) || {};
+        
         let currentUser = null; let lang = 'ar';
         const modal = new bootstrap.Modal(document.getElementById('mainModal'));
         
@@ -234,7 +235,8 @@
                 document.getElementById('user-display').innerText = f.u; 
                 if(f.r === 'admin') document.getElementById('admin-menu').style.display = 'block';
                 if(!readNotifs[currentUser.u]) readNotifs[currentUser.u] = [];
-                render(); checkNotifications();
+                render(); 
+                checkNotifications();
             } else document.getElementById('login-error').style.display = 'block';
         }
 
@@ -283,25 +285,15 @@
             };
 
             const stats = `${entry.e.length} أجانب - ${entry.w.length} عجلات - ${entry.l.length} عراقيين`;
-
             if(type === 'auth') {
-                entry.full_bn = `TEMP - ${entry.bn_orig} - ${entry.pt} - ${stats} وفقط`; 
-                entry.status = entry.rd ? 'Done' : 'Pending';
-
-                if(id) { 
-                    authData[authData.findIndex(x=>x.id == id)] = entry; 
-                    let pIdx = permData.findIndex(p => p.ref === entry.ref);
-                    if(pIdx !== -1) { permData[pIdx].pt=entry.pt; permData[pIdx].ta=entry.ta; permData[pIdx].w=entry.w; permData[pIdx].e=entry.e; permData[pIdx].l=entry.l; permData[pIdx].wp=entry.wp; permData[pIdx].full_bn = `ISCO - ${permData[pIdx].bn_orig||''} - ${entry.pt} - ${stats} وفقط`; }
+                entry.full_bn = `TEMP - ${entry.bn_orig} - ${entry.pt} - ${stats}`; entry.status = entry.rd ? 'Done' : 'Pending';
+                if(id) { authData[authData.findIndex(x=>x.id == id)] = entry; let pIdx = permData.findIndex(p => p.ref === entry.ref);
+                    if(pIdx !== -1) { permData[pIdx].pt=entry.pt; permData[pIdx].ta=entry.ta; permData[pIdx].w=entry.w; permData[pIdx].e=entry.e; permData[pIdx].l=entry.l; permData[pIdx].wp=entry.wp; permData[pIdx].full_bn = `ISCO - ${permData[pIdx].bn_orig} - ${entry.pt} - ${stats}`; }
                 } else authData.push(entry);
 
-                if(entry.status === 'Done' && !permData.find(p=>p.ref === entry.ref)) { 
-                    let copy = JSON.parse(JSON.stringify(entry)); 
-                    copy.id = Date.now()+1; copy.bn_orig = ""; copy.full_bn = ""; copy.ofp = ""; copy.sd = ""; copy.rd = ""; copy.status = "Pending"; 
-                    permData.push(copy); 
-                }
+                if(entry.status === 'Done' && !permData.find(p=>p.ref === entry.ref)) { let copy = JSON.parse(JSON.stringify(entry)); copy.id = Date.now()+1; copy.bn_orig = ""; copy.full_bn = ""; copy.ofp = ""; copy.sd = ""; copy.rd = ""; copy.status = "Pending"; permData.push(copy); }
             } else {
-                entry.status = entry.rd ? 'Completed' : 'Pending'; 
-                entry.full_bn = `ISCO - ${entry.bn_orig} - ${entry.pt} - ${stats} وفقط`;
+                entry.status = entry.rd ? 'Completed' : 'Pending'; entry.full_bn = `ISCO - ${entry.bn_orig} - ${entry.pt} - ${stats}`;
                 permData[permData.findIndex(x=>x.id == id)] = entry;
             }
             saveToStorage(); render(); checkNotifications(); modal.hide();
@@ -323,25 +315,28 @@
             });
             const b = document.getElementById('notif-count'); const l = document.getElementById('notif-list');
             if(alerts.length > 0) {
-                if(unreadCount > 0) { b.classList.remove('d-none'); b.innerText = unreadCount; } else { b.classList.add('d-none'); }
+                if(unreadCount > 0) { b.style.display = 'inline-block'; b.innerText = unreadCount; } else { b.style.display = 'none'; }
                 l.innerHTML = '';
                 alerts.forEach(a => l.innerHTML += `<li class="notif-item"><i class="fa fa-exclamation-triangle text-danger me-2"></i><strong>${a.bn}</strong><br><small class="text-muted">ينتهي بعد: <span class="text-danger fw-bold">${a.left} أيام</span></small></li>`);
-            } else { b.classList.add('d-none'); l.innerHTML = `<li class="p-3 text-center text-muted small fw-bold">لا توجد إشعارات</li>`; }
+            } else { b.style.display = 'none'; l.innerHTML = `<li class="p-3 text-center text-muted small fw-bold">لا توجد إشعارات</li>`; }
         }
 
-        // إخفاء الإشعار مباشرة عند الضغط عليه
-        function markNotificationsAsRead() {
+        // دالة تفتح القائمة وتخفي الإشعار فوراً وتسجله بالذاكرة
+        function openNotifications() {
             if(!currentUser) return;
+            
+            // إخفاء العداد الأحمر فوراً عبر Style
+            document.getElementById('notif-count').style.display = 'none';
+            
             const today = new Date();
             permData.forEach(p => {
                 if(p.rd) {
-                    const diffDays = Math.floor(Math.abs(today - new Date(p.rd)) / (1000 * 60 * 60 * 24));
+                    const diffDays = Math.ceil(Math.abs(today - new Date(p.rd)) / (1000 * 60 * 60 * 24));
                     if((21 - diffDays) <= 10 && (21 - diffDays) >= 0) {
                         if(!readNotifs[currentUser.u].includes(p.id)) readNotifs[currentUser.u].push(p.id);
                     }
                 }
             });
-            document.getElementById('notif-count').classList.add('d-none');
             saveToStorage();
         }
 
@@ -349,8 +344,8 @@
             let html = '';
             if(i.w.length>0||i.e.length>0||i.l.length>0||i.wp.length>0) {
                 html += `<div class="names-preview">`;
-                if(i.w.length>0) html+=`<strong>🚗 عجلات:</strong> ${i.w.join('، ')}<br>`; if(i.e.length>0) html+=`<strong>👤 أجانب:</strong> ${i.e.join('، ')}<br>`;
-                if(i.l.length>0) html+=`<strong>👨🏽 عراقيين:</strong> ${i.l.join('، ')}<br>`; if(i.wp.length>0) html+=`<strong>🔫 أسلحة:</strong> ${i.wp.join('، ')}<br>`;
+                if(i.w.length>0) html+=`<strong>🚗 العجلات:</strong> ${i.w.join('، ')}<br>`; if(i.e.length>0) html+=`<strong>👤 الأجانب:</strong> ${i.e.join('، ')}<br>`;
+                if(i.l.length>0) html+=`<strong>👨🏽 العراقيين:</strong> ${i.l.join('، ')}<br>`; if(i.wp.length>0) html+=`<strong>🔫 الأسلحة:</strong> ${i.wp.join('، ')}<br>`;
                 html += `</div>`;
             } return html;
         }
@@ -417,7 +412,7 @@
         }
         function editUser(i) { document.getElementById('nu').value=users[i].u; document.getElementById('np').value=users[i].p; document.getElementById('edit-user-idx').value=i; document.getElementById('btn-save-user').innerText="تحديث"; }
         function handleUser() { const u=document.getElementById('nu').value, p=document.getElementById('np').value, idx=parseInt(document.getElementById('edit-user-idx').value); if(!u||!p) return; if(idx!==-1){ users[idx].u=u; users[idx].p=p; document.getElementById('edit-user-idx').value=-1; document.getElementById('btn-save-user').innerText="إضافة"; } else users.push({u,p,r:'user'}); document.getElementById('nu').value=''; document.getElementById('np').value=''; saveToStorage(); render(); }
-        function exportData(t) { const d = t==='auth'?authData:permData; const ws = XLSX.utils.json_to_sheet(d.map(i=>({ Ref: i.ref, Book_No: i.bn_orig, Full_Name: i.full_bn, Authority: i.ta, Type: i.pt, Memo: i.memo||'', OFP: i.ofp||'', Sent: i.sd||'', Received: i.rd||'', Status: i.status, Creator: i.creator, Wheels: i.w.join(' | '), Expats: i.e.join(' | '), Locals: i.l.join(' | '), Weapons: i.wp.join(' | ') }))); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Data"); XLSX.writeFile(wb, `ControlRisks_${t}.xlsx`); }
+        function exportData(t) { const d = t==='auth'?authData:permData; const ws = XLSX.utils.json_to_sheet(d.map(i=>({ Ref: i.ref, Book_No: i.bn_orig, Full_Name: i.full_bn, Authority: i.ta, Type: i.pt, Memo: i.memo||'', OFP: i.ofp||'', Sent: i.sd||'', Received: i.rd||'', Status: i.status, Creator: i.creator, Wheels: i.w.join(' | '), Expats: i.e.join(' | '), Locals: i.l.join(' | '), Weapons: i.wp.join(' | ') }))); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Data"); XLSX.writeFile(wb, `CR_${t}.xlsx`); }
         function toggleLanguage() { lang = lang==='ar'?'en':'ar'; document.getElementById('html-tag').dir = lang==='en'?'ltr':'rtl'; document.body.className = lang==='en'?'ltr-mode text-start':'rtl-mode text-start'; }
     </script>
 </body>
