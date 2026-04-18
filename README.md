@@ -77,9 +77,9 @@
             <div class="sidebar-header"><h5>CONTROL RISKS</h5></div>
             <ul>
                 <li><a onclick="showTab('auth')" id="link-auth" class="active"><i class="fa fa-folder-open ms-2"></i> الطلبات للهيئات</a></li>
-                <li><a onclick="showTab('permits')" id="link-permits"><i class="fa fa-id-card-clip ms-2"></i> التصاريح المستلمة</a></li>
-                <li id="admin-menu" style="display: none;"><a onclick="showTab('users')" id="link-users"><i class="fa fa-users-gear ms-2"></i> إدارة الحسابات</a></li>
-                <li><a onclick="logout()"><i class="fa fa-power-off ms-2"></i> خروج</a></li>
+                <li><a onclick="showTab('permits')" id="link-permits"><i class="fa fa-check-circle ms-2"></i> التصاريح المستلمة</a></li>
+                <li id="admin-menu" style="display: none;"><a onclick="showTab('users')" id="link-users"><i class="fa fa-users-cog ms-2"></i> إدارة الحسابات</a></li>
+                <li><a onclick="logout()"><i class="fa fa-sign-out-alt ms-2"></i> خروج</a></li>
             </ul>
         </nav>
 
@@ -89,7 +89,7 @@
                     <button class="btn btn-sm btn-outline-secondary fw-bold ms-3" onclick="toggleLanguage()">EN / AR</button>
                     <!-- الإشعارات -->
                     <div class="dropdown">
-                        <button class="btn btn-light position-relative border" data-bs-toggle="dropdown" aria-expanded="false" onclick="markNotificationsAsRead()">
+                        <button class="btn btn-light position-relative border" id="bell-btn" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="fa fa-bell text-warning fs-5"></i>
                             <span id="notif-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none">0</span>
                         </button>
@@ -105,20 +105,27 @@
                 <!-- قسم الهيئات -->
                 <div id="auth-section">
                     <div class="d-flex justify-content-between mb-3 align-items-center">
-                        <h3 class="fw-bold mb-0">سجل الطلبات للهيئات</h3>
+                        <h3 class="fw-bold mb-0">الطلبات للهيئات</h3>
                         <button class="btn btn-cr shadow-sm px-4" onclick="openModal('auth')"><i class="fa fa-plus me-1"></i> إضافة طلب</button>
                     </div>
+
+                    <!-- الفلاتر -->
                     <div class="filter-box row g-2 align-items-end">
-                        <div class="col-md-2"><span class="filter-label">رقم الكتاب</span><input type="text" id="f-auth-bn" class="form-control" onkeyup="currPageAuth=1;render()"></div>
-                        <div class="col-md-3"><span class="filter-label">البحث بالأسماء</span><input type="text" id="f-auth-list" class="form-control" onkeyup="currPageAuth=1;render()"></div>
-                        <div class="col-md-2"><span class="filter-label">من تاريخ</span><input type="date" id="f-auth-from" class="form-control" onchange="currPageAuth=1;render()"></div>
-                        <div class="col-md-2"><span class="filter-label">إلى تاريخ</span><input type="date" id="f-auth-to" class="form-control" onchange="currPageAuth=1;render()"></div>
-                        <div class="col-md-2"><span class="filter-label">الحالة</span><select id="f-auth-status" class="form-select" onchange="currPageAuth=1;render()"><option value="">الكل</option><option value="Pending">Pending</option><option value="Done">Completed</option></select></div>
-                        <div class="col-md-1"><button class="btn btn-secondary w-100" onclick="clearFilters('auth')"><i class="fa fa-eraser"></i></button></div>
+                        <div class="col-md-2"><label class="filter-label">رقم الكتاب</label><input type="text" id="filter-auth-bn" class="form-control" placeholder="بحث..." onkeyup="currPageAuth=1;render()"></div>
+                        <div class="col-md-3"><label class="filter-label">البحث في الأسماء/القوائم</label><input type="text" id="filter-auth-list" class="form-control" placeholder="اسم، سلاح، عجلة..." onkeyup="currPageAuth=1;render()"></div>
+                        <div class="col-md-2"><label class="filter-label">من تاريخ</label><input type="date" id="filter-auth-from" class="form-control" onchange="currPageAuth=1;render()"></div>
+                        <div class="col-md-2"><label class="filter-label">إلى تاريخ</label><input type="date" id="filter-auth-to" class="form-control" onchange="currPageAuth=1;render()"></div>
+                        <div class="col-md-2"><label class="filter-label">الحالة</label><select id="filter-auth-status" class="form-select" onchange="currPageAuth=1;render()"><option value="">الكل</option><option value="Pending">Pending</option><option value="Done">Completed</option></select></div>
+                        <div class="col-md-1"><button class="btn btn-secondary w-100" onclick="resetFilters('auth')"><i class="fa fa-sync"></i></button></div>
                     </div>
+
                     <div class="custom-card table-responsive">
-                        <table class="table align-middle text-center">
-                            <thead class="table-dark"><tr><th>Ref</th><th style="width:25%;">الكتاب والأسماء</th><th>الهيئة/النوع</th><th>المذكرة</th><th>إرسال</th><th>استلام</th><th>بواسطة</th><th>الحالة</th><th>إجراء</th></tr></thead>
+                        <table class="table table-hover align-middle border text-center">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Ref</th><th style="width: 30%;">الكتاب والأسماء</th><th>الهيئة/النوع</th><th>المذكرة</th><th>إرسال</th><th>استلام</th><th>بواسطة</th><th>الحالة</th><th>إجراء</th>
+                                </tr>
+                            </thead>
                             <tbody id="auth-body"></tbody>
                         </table>
                         <nav class="mt-3 d-flex justify-content-between align-items-center">
@@ -131,21 +138,27 @@
                 <!-- قسم التصاريح -->
                 <div id="permits-section" style="display: none;">
                     <h3 class="fw-bold mb-3" style="color: var(--cr-olive);">التصاريح المستلمة</h3>
+                    <!-- فلاتر التصاريح -->
                     <div class="filter-box row g-2 align-items-end">
-                        <div class="col-md-2"><span class="filter-label">رقم الكتاب</span><input type="text" id="f-perm-bn" class="form-control" onkeyup="currPagePerm=1;render()"></div>
-                        <div class="col-md-2"><span class="filter-label">OFP/المذكرة</span><input type="text" id="f-perm-ofp" class="form-control" onkeyup="currPagePerm=1;render()"></div>
-                        <div class="col-md-3"><span class="filter-label">البحث بالأسماء</span><input type="text" id="f-perm-list" class="form-control" onkeyup="currPagePerm=1;render()"></div>
-                        <div class="col-md-2"><span class="filter-label">من تاريخ</span><input type="date" id="f-perm-from" class="form-control" onchange="currPagePerm=1;render()"></div>
-                        <div class="col-md-2"><span class="filter-label">إلى تاريخ</span><input type="date" id="f-perm-to" class="form-control" onchange="currPagePerm=1;render()"></div>
-                        <div class="col-md-1"><button class="btn btn-secondary w-100" onclick="clearFilters('perm')"><i class="fa fa-eraser"></i></button></div>
+                        <div class="col-md-2"><label class="filter-label">رقم الكتاب</label><input type="text" id="filter-perm-bn" class="form-control" onkeyup="currPagePerm=1;render()"></div>
+                        <div class="col-md-2"><label class="filter-label">OFP / Ref</label><input type="text" id="filter-perm-ofp" class="form-control" onkeyup="currPagePerm=1;render()"></div>
+                        <div class="col-md-3"><label class="filter-label">بحث في الأسماء</label><input type="text" id="filter-perm-list" class="form-control" onkeyup="currPagePerm=1;render()"></div>
+                        <div class="col-md-2"><label class="filter-label">من تاريخ</label><input type="date" id="filter-perm-from" class="form-control" onchange="currPagePerm=1;render()"></div>
+                        <div class="col-md-2"><label class="filter-label">إلى تاريخ</label><input type="date" id="filter-perm-to" class="form-control" onchange="currPagePerm=1;render()"></div>
+                        <div class="col-md-1"><button class="btn btn-secondary w-100" onclick="resetFilters('perm')"><i class="fa fa-sync"></i></button></div>
                     </div>
+
                     <div class="custom-card table-responsive">
                         <table class="table table-bordered align-middle text-center">
-                            <thead class="table-success"><tr><th>Ref/OFP</th><th style="width:25%;">التصريح والأسماء</th><th>الهيئة/النوع</th><th>المذكرة</th><th>إرسال</th><th>استلام</th><th>بواسطة</th><th>الحالة</th><th>إجراء</th></tr></thead>
+                            <thead class="table-success text-dark">
+                                <tr>
+                                    <th>Ref / OFP</th><th style="width: 30%;">كتاب التصريح والأسماء</th><th>الهيئة/النوع</th><th>المذكرة</th><th>إرسال</th><th>استلام</th><th>بواسطة</th><th>الحالة</th><th>إجراء</th>
+                                </tr>
+                            </thead>
                             <tbody id="perm-body"></tbody>
                         </table>
                         <nav class="mt-3 d-flex justify-content-between align-items-center">
-                            <button class="btn btn-success btn-sm shadow-sm" onclick="exportData('permits')"><i class="fa fa-file-excel"></i> تصدير</button>
+                            <button class="btn btn-success btn-sm shadow-sm" onclick="exportData('perm')"><i class="fa fa-file-excel"></i> تصدير</button>
                             <ul class="pagination pagination-sm mb-0" id="perm-pagination"></ul>
                         </nav>
                     </div>
@@ -155,7 +168,7 @@
                 <div id="users-section" style="display: none;">
                     <h3 class="fw-bold mb-4">إدارة الحسابات</h3>
                     <div class="custom-card">
-                        <div class="row g-2 mb-4">
+                        <div class="row g-2 mb-4 bg-light p-3 rounded border">
                             <input type="hidden" id="edit-user-idx" value="-1">
                             <div class="col-md-4"><label class="small fw-bold">اسم المستخدم</label><input id="nu" class="form-control"></div>
                             <div class="col-md-4"><label class="small fw-bold">كلمة المرور</label><input id="np" class="form-control"></div>
@@ -176,30 +189,38 @@
         </div>
     </div>
 
-    <!-- Modal -->
-    <div class="modal fade" id="mainModal" tabindex="-1">
+    <!-- Modal Form -->
+    <div class="modal fade" id="mainModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-xl">
-            <div class="modal-content border-0 shadow-lg">
-                <div class="modal-header text-white" style="background: var(--cr-olive);"><h5 class="modal-title fw-bold">بيانات الطلب</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
-                <div class="modal-body p-4 text-start">
-                    <input type="hidden" id="form-type"><input type="hidden" id="edit-id">
-                    <div class="row g-3">
-                        <div class="col-md-3"><label class="fw-bold small">رقم الكتاب</label><input type="text" id="m-bn" class="form-control" required></div>
-                        <div class="col-md-3"><label class="fw-bold small">نوع التصريح</label><select id="m-pt" class="form-select"><option value="مؤقت">مؤقت</option><option value="دائمي">دائمي</option></select></div>
-                        <div class="col-md-3"><label class="fw-bold small">الهيئة</label><select id="m-ta" class="form-select"><option value="BGC">BGC</option><option value="ROO">ROO</option><option value="SRC">SRC</option></select></div>
-                        <div class="col-md-3" id="ofp-box"><label class="fw-bold small text-primary">OFP Number</label><input type="text" id="m-ofp" class="form-control"></div>
-                        <div class="col-md-3"><label class="fw-bold small">إرسال</label><input type="date" id="m-sd" class="form-control"></div>
-                        <div class="col-md-3"><label class="fw-bold small">استلام</label><input type="date" id="m-rd" class="form-control"></div>
-                        <div class="col-md-3"><label class="fw-bold small">رقم المذكرة</label><input type="text" id="m-memo" class="form-control"></div>
-                        <div class="col-md-3"><label class="fw-bold small">مرفق (اختياري)</label><input type="file" id="m-file" class="form-control"></div>
-                        <div class="col-12 mt-4"><div class="alert alert-secondary border small text-center fw-bold">انسخ القوائم من الوورد والصقها مباشرة هنا</div></div>
-                        <div class="col-md-3"><label class="fw-bold small">العجلات</label><textarea id="m-w" class="form-control" rows="4"></textarea></div>
-                        <div class="col-md-3"><label class="fw-bold small">الأجانب</label><textarea id="m-e" class="form-control" rows="4"></textarea></div>
-                        <div class="col-md-3"><label class="fw-bold small">العراقيين</label><textarea id="m-l" class="form-control" rows="4"></textarea></div>
-                        <div class="col-md-3"><label class="fw-bold small">الأسلحة</label><textarea id="m-wp" class="form-control" rows="4"></textarea></div>
+            <div class="modal-content text-start border-0 shadow-lg">
+                <form id="orderForm">
+                    <div class="modal-header text-white" style="background: var(--cr-olive);">
+                        <h5 class="modal-title fw-bold">بيانات الطلب</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                     </div>
-                </div>
-                <div class="modal-footer"><button onclick="saveOrder()" class="btn btn-cr px-5">حفظ</button></div>
+                    <div class="modal-body p-4">
+                        <input type="hidden" id="form-type"><input type="hidden" id="edit-id">
+                        <div class="row g-3">
+                            <div class="col-md-3"><label class="fw-bold small">رقم الكتاب</label><input type="text" id="m-bn" class="form-control" required></div>
+                            <div class="col-md-3"><label class="fw-bold small">نوع التصريح</label><select id="m-pt" class="form-select"><option value="مؤقت">مؤقت</option><option value="دائمي">دائمي</option></select></div>
+                            <div class="col-md-3"><label class="fw-bold small">الهيئة</label><select id="m-ta" class="form-select"><option value="BGC">BGC</option><option value="ROO">ROO</option><option value="SRC">SRC</option></select></div>
+                            <div class="col-md-3" id="ofp-box"><label class="fw-bold small text-primary">OFP Number</label><input type="text" id="m-ofp" class="form-control"></div>
+                            <div class="col-md-3"><label class="fw-bold small">إرسال</label><input type="date" id="m-sd" class="form-control"></div>
+                            <div class="col-md-3"><label class="fw-bold small">استلام</label><input type="date" id="m-rd" class="form-control"></div>
+                            <div class="col-md-3"><label class="fw-bold small">رقم المذكرة</label><input type="text" id="m-memo" class="form-control"></div>
+                            <div class="col-md-3"><label class="fw-bold small">مرفق (PDF/Image)</label><input type="file" id="m-file" class="form-control"></div>
+                            
+                            <div class="col-12 mt-4"><div class="alert alert-secondary border small text-center fw-bold">انسخ القوائم من الوورد والصقها مباشرة هنا</div></div>
+                            <div class="col-md-3"><label class="small fw-bold text-muted"><i class="fa fa-car"></i> العجلات</label><textarea id="m-w" class="form-control" rows="4"></textarea></div>
+                            <div class="col-md-3"><label class="small fw-bold text-muted"><i class="fa fa-user"></i> الأجانب</label><textarea id="m-e" class="form-control" rows="4"></textarea></div>
+                            <div class="col-md-3"><label class="small fw-bold text-muted"><i class="fa fa-user-tie"></i> العراقيين</label><textarea id="m-l" class="form-control" rows="4"></textarea></div>
+                            <div class="col-md-3"><label class="small fw-bold text-muted"><i class="fa fa-gun"></i> الأسلحة</label><textarea id="m-wp" class="form-control" rows="4"></textarea></div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-cr px-5">حفظ وتأكيد</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -209,24 +230,31 @@
         let authData = JSON.parse(localStorage.getItem('CR_AUTH')) || [];
         let permData = JSON.parse(localStorage.getItem('CR_PERM')) || [];
         let users = JSON.parse(localStorage.getItem('CR_USERS')) || [{u:'admin', p:'1234', r:'admin'}];
-        let readNotifs = JSON.parse(localStorage.getItem('CR_READ_NOTIFS')) || {}; // نظام تسجيل القراءة لكل يوزر
+        let readNotifs = JSON.parse(localStorage.getItem('CR_NOTIFS')) || {};
         let currentUser = null; let lang = 'ar';
         const modal = new bootstrap.Modal(document.getElementById('mainModal'));
         
         let currPageAuth = 1; let currPagePerm = 1; const rowsPerPage = 15;
 
         function saveToStorage() {
-            try { localStorage.setItem('CR_AUTH', JSON.stringify(authData)); localStorage.setItem('CR_PERM', JSON.stringify(permData)); localStorage.setItem('CR_USERS', JSON.stringify(users)); localStorage.setItem('CR_READ_NOTIFS', JSON.stringify(readNotifs)); checkNotifications(); } 
-            catch(e) { alert("⚠️ الذاكرة ممتلئة! يرجى حذف بعض الملفات المرفقة."); }
+            try { 
+                localStorage.setItem('CR_AUTH', JSON.stringify(authData)); 
+                localStorage.setItem('CR_PERM', JSON.stringify(permData)); 
+                localStorage.setItem('CR_USERS', JSON.stringify(users)); 
+                localStorage.setItem('CR_NOTIFS', JSON.stringify(readNotifs)); 
+            } catch(e) { alert("⚠️ الذاكرة ممتلئة!"); }
         }
 
         function loginSystem() {
             const u = document.getElementById('userInput').value, p = document.getElementById('passInput').value;
             const f = users.find(x => x.u === u && x.p === p);
             if(f) {
-                currentUser = f; document.getElementById('login-page').style.display = 'none'; document.getElementById('main-dashboard').style.display = 'block';
-                document.getElementById('user-display').innerText = f.u; if(f.r === 'admin') document.getElementById('admin-menu').style.display = 'block';
-                if(!readNotifs[currentUser.u]) readNotifs[currentUser.u] = []; // تهيئة الإشعارات لليوزر
+                currentUser = f; 
+                if(!readNotifs[currentUser.u]) readNotifs[currentUser.u] = []; // تهيئة الإشعارات للمستخدم
+                document.getElementById('login-page').style.display = 'none'; 
+                document.getElementById('main-dashboard').style.display = 'block';
+                document.getElementById('user-display').innerText = f.u; 
+                if(f.r === 'admin') document.getElementById('admin-menu').style.display = 'block';
                 render(); checkNotifications();
             } else document.getElementById('login-error').style.display = 'block';
         }
@@ -260,8 +288,8 @@
             } modal.show();
         }
 
-        async function saveOrder() {
-            const bnInput = document.getElementById('m-bn').value; if(!bnInput) return alert("يرجى إدخال رقم الكتاب");
+        document.getElementById('orderForm').onsubmit = async (e) => {
+            e.preventDefault();
             const type = document.getElementById('form-type').value, id = document.getElementById('edit-id').value;
             const getL = (eid) => document.getElementById(eid).value.split('\n').filter(l => l.trim() !== "");
             let ex = id ? (type==='auth'?authData:permData).find(x=>x.id==id) : null;
@@ -270,38 +298,38 @@
             if(fInput.files.length > 0) fileBase64 = await new Promise(r => { const rd = new FileReader(); rd.onload=()=>r(rd.result); rd.readAsDataURL(fInput.files[0]); });
 
             const entry = {
-                id: id ? parseInt(id) : Date.now(), bn_orig: bnInput, pt: document.getElementById('m-pt').value, ta: document.getElementById('m-ta').value,
+                id: id ? parseInt(id) : Date.now(), bn_orig: document.getElementById('m-bn').value, pt: document.getElementById('m-pt').value, ta: document.getElementById('m-ta').value,
                 memo: document.getElementById('m-memo').value, ofp: document.getElementById('m-ofp').value, sd: document.getElementById('m-sd').value, rd: document.getElementById('m-rd').value,
                 w: getL('m-w'), e: getL('m-e'), l: getL('m-l'), wp: getL('m-wp'), creator: ex ? ex.creator : currentUser.u, ref: ex ? ex.ref : 'REF-'+Math.floor(1000+Math.random()*9000), file: fileBase64
             };
 
             const stats = `${entry.e.length} أجانب - ${entry.w.length} عجلات - ${entry.l.length} عراقيين`;
+
             if(type === 'auth') {
-                entry.full_bn = `TEMP - ${entry.bn_orig} - ${entry.pt} - ${stats} وفقط`; entry.status = entry.rd ? 'Done' : 'Pending';
+                entry.full_bn = `TEMP - ${entry.bn_orig} - ${entry.pt} - ${stats}`; entry.status = entry.rd ? 'Done' : 'Pending';
                 if(id) { authData[authData.findIndex(x=>x.id == id)] = entry; let pIdx = permData.findIndex(p => p.ref === entry.ref);
-                    if(pIdx !== -1) { permData[pIdx].pt=entry.pt; permData[pIdx].ta=entry.ta; permData[pIdx].w=entry.w; permData[pIdx].e=entry.e; permData[pIdx].l=entry.l; permData[pIdx].wp=entry.wp; permData[pIdx].full_bn = `ISCO - ${permData[pIdx].bn_orig} - ${entry.pt} - ${stats} وفقط`; }
+                    if(pIdx !== -1) { permData[pIdx].pt=entry.pt; permData[pIdx].ta=entry.ta; permData[pIdx].w=entry.w; permData[pIdx].e=entry.e; permData[pIdx].l=entry.l; permData[pIdx].wp=entry.wp; permData[pIdx].full_bn = `ISCO - ${permData[pIdx].bn_orig||""} - ${entry.pt} - ${stats}`; }
                 } else authData.push(entry);
 
                 if(entry.status === 'Done' && !permData.find(p=>p.ref === entry.ref)) { let copy = JSON.parse(JSON.stringify(entry)); copy.id = Date.now()+1; copy.bn_orig = ""; copy.full_bn = ""; copy.ofp = ""; copy.sd = ""; copy.rd = ""; copy.status = "Pending"; permData.push(copy); }
             } else {
-                entry.status = entry.rd ? 'Completed' : 'Pending'; entry.full_bn = `ISCO - ${entry.bn_orig} - ${entry.pt} - ${stats} وفقط`;
+                entry.status = entry.rd ? 'Completed' : 'Pending'; entry.full_bn = `ISCO - ${entry.bn_orig} - ${entry.pt} - ${stats}`;
                 permData[permData.findIndex(x=>x.id == id)] = entry;
             }
-            saveToStorage(); render(); modal.hide();
-        }
+            saveToStorage(); render(); checkNotifications(); modal.hide();
+        };
 
-        // نظام الإشعارات المنفصل لكل مستخدم
+        // هندسة الإشعارات
         function checkNotifications() {
             if(!currentUser) return;
             let alerts = []; let unreadCount = 0; const today = new Date();
             
             permData.forEach(p => {
                 if(p.rd) {
-                    const rDate = new Date(p.rd); const diffTime = Math.abs(today - rDate); const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    const rDate = new Date(p.rd); const diffTime = today - rDate; const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
                     const daysLeft = 21 - diffDays;
                     if(daysLeft <= 10 && daysLeft >= 0) {
                         alerts.push({id: p.id, bn: p.full_bn, left: daysLeft});
-                        // نتحقق إذا كان اليوزر قد قرأ هذا الإشعار مسبقاً
                         if(!readNotifs[currentUser.u].includes(p.id)) unreadCount++;
                     }
                 }
@@ -314,13 +342,13 @@
             } else { b.classList.add('d-none'); l.innerHTML = `<li class="p-3 text-center text-muted small fw-bold">لا توجد إشعارات</li>`; }
         }
 
-        // إخفاء العداد عند فتح الإشعارات وتسجيلها كمقروءة
-        function markNotificationsAsRead() {
+        // تسجيل مشاهدة الإشعار عند الضغط
+        document.getElementById('bell-btn').addEventListener('click', function() {
             if(!currentUser) return;
             const today = new Date();
             permData.forEach(p => {
                 if(p.rd) {
-                    const diffDays = Math.ceil(Math.abs(today - new Date(p.rd)) / (1000 * 60 * 60 * 24));
+                    const diffDays = Math.floor((today - new Date(p.rd)) / (1000 * 60 * 60 * 24));
                     if((21 - diffDays) <= 10 && (21 - diffDays) >= 0) {
                         if(!readNotifs[currentUser.u].includes(p.id)) readNotifs[currentUser.u].push(p.id);
                     }
@@ -328,25 +356,25 @@
             });
             document.getElementById('notif-count').classList.add('d-none');
             saveToStorage();
-        }
+        });
 
         function generateNamesPreview(i) {
             let html = '';
             if(i.w.length>0||i.e.length>0||i.l.length>0||i.wp.length>0) {
                 html += `<div class="names-preview">`;
-                if(i.w.length>0) html+=`<strong>🚗 العجلات:</strong> ${i.w.join('، ')}<br>`; if(i.e.length>0) html+=`<strong>👤 الأجانب:</strong> ${i.e.join('، ')}<br>`;
-                if(i.l.length>0) html+=`<strong>👨🏽 العراقيين:</strong> ${i.l.join('، ')}<br>`; if(i.wp.length>0) html+=`<strong>🔫 الأسلحة:</strong> ${i.wp.join('، ')}<br>`;
+                if(i.w.length>0) html+=`<strong>🚗 عجلات:</strong> ${i.w.join('، ')}<br>`; if(i.e.length>0) html+=`<strong>👤 أجانب:</strong> ${i.e.join('، ')}<br>`;
+                if(i.l.length>0) html+=`<strong>👨🏽 عراقيين:</strong> ${i.l.join('، ')}<br>`; if(i.wp.length>0) html+=`<strong>🔫 أسلحة:</strong> ${i.wp.join('، ')}<br>`;
                 html += `</div>`;
             } return html;
         }
 
         function getFilteredData(data, type) {
-            const bn = document.getElementById(type==='auth'?'f-auth-bn':'f-perm-bn').value.toLowerCase();
-            const list = document.getElementById(type==='auth'?'f-auth-list':'f-perm-list').value.toLowerCase();
-            const from = document.getElementById(type==='auth'?'f-auth-from':'f-perm-from').value;
-            const to = document.getElementById(type==='auth'?'f-auth-to':'f-perm-to').value;
-            const status = type==='auth' ? document.getElementById('f-auth-status').value : null;
-            const ofp = type==='permits' ? document.getElementById('f-perm-ofp').value.toLowerCase() : '';
+            const bn = document.getElementById(type==='auth'?'filter-auth-bn':'filter-perm-bn').value.toLowerCase();
+            const list = document.getElementById(type==='auth'?'filter-auth-list':'filter-perm-list').value.toLowerCase();
+            const from = document.getElementById(type==='auth'?'filter-auth-from':'filter-perm-from').value;
+            const to = document.getElementById(type==='auth'?'filter-auth-to':'filter-perm-to').value;
+            const status = type==='auth' ? document.getElementById('filter-auth-status').value : null;
+            const ofp = type==='permits' ? document.getElementById('filter-perm-ofp').value.toLowerCase() : '';
 
             return data.filter(i => {
                 const mBn = (i.bn_orig||'').toLowerCase().includes(bn);
@@ -368,23 +396,25 @@
         }
 
         function render() {
+            // Auth Render
             const fAuth = getFilteredData(authData, 'auth').reverse();
             const startAuth = (currPageAuth - 1) * rowsPerPage; const paginatedAuth = fAuth.slice(startAuth, startAuth + rowsPerPage);
             const ab = document.getElementById('auth-body'); ab.innerHTML = '';
             paginatedAuth.forEach(i => {
                 const sBadge = i.status==='Done'?'<span class="badge bg-success">Completed</span>':'<span class="badge bg-warning text-dark">Pending</span>';
                 const fileIco = i.file?`<a href="#" onclick="openFile('${i.file}')" class="text-danger ms-1"><i class="fa fa-paperclip fa-lg"></i></a>`:'';
-                ab.innerHTML += `<tr><td><span class="badge bg-secondary shadow-sm">${i.ref}</span></td><td class="text-start"><span class="fw-bold" style="color:var(--cr-olive);">${i.full_bn}</span>${generateNamesPreview(i)}</td><td><span class="badge bg-dark">${i.ta}</span><br><small class="fw-bold text-muted">${i.pt}</small></td><td class="fw-bold">${i.memo||'-'}${fileIco}</td><td><small>${i.sd||'-'}</small></td><td><small>${i.rd||'-'}</small></td><td><span class="badge bg-light text-dark border"><i class="fa fa-user me-1"></i> ${i.creator}</span></td><td>${sBadge}</td><td><div class="btn-group"><button class="btn btn-sm btn-light border" onclick="openModal('auth',${i.id})"><i class="fa fa-edit text-primary"></i></button><button class="btn btn-sm btn-light border" onclick="deleteRec('auth',${i.id})"><i class="fa fa-trash text-danger"></i></button></div></td></tr>`;
+                ab.innerHTML += `<tr><td><span class="badge bg-secondary shadow-sm">${i.ref}</span></td><td class="text-start"><strong style="color:var(--cr-olive);">${i.full_bn}</strong>${generateNamesPreview(i)}</td><td><span class="badge bg-dark">${i.ta}</span><br><small class="fw-bold text-muted">${i.pt}</small></td><td class="fw-bold">${i.memo||'-'}${fileIco}</td><td><small>${i.sd||'-'}</small></td><td><small>${i.rd||'-'}</small></td><td><span class="badge bg-light text-dark border"><i class="fa fa-user me-1"></i> ${i.creator}</span></td><td>${sBadge}</td><td><div class="btn-group"><button class="btn btn-sm btn-light border" onclick="openModal('auth',${i.id})"><i class="fa fa-edit text-primary"></i></button><button class="btn btn-sm btn-light border" onclick="deleteRec('auth',${i.id})"><i class="fa fa-trash text-danger"></i></button></div></td></tr>`;
             });
             renderPagination(fAuth.length, currPageAuth, 'auth');
 
+            // Perm Render
             const fPerm = getFilteredData(permData, 'permits').reverse();
             const startPerm = (currPagePerm - 1) * rowsPerPage; const paginatedPerm = fPerm.slice(startPerm, startPerm + rowsPerPage);
             const pb = document.getElementById('perm-body'); pb.innerHTML = '';
             paginatedPerm.forEach(i => {
                 const sBadge = i.status==='Completed'?'<span class="badge bg-success">Completed</span>':'<span class="badge bg-warning text-dark">Pending</span>';
                 const fileIco = i.file?`<a href="#" onclick="openFile('${i.file}')" class="text-danger ms-1"><i class="fa fa-paperclip fa-lg"></i></a>`:'';
-                pb.innerHTML += `<tr><td><span class="badge bg-secondary shadow-sm mb-1">${i.ref}</span><br><strong class="text-primary small">${i.ofp||'-'}</strong></td><td class="text-start"><span class="fw-bold" style="color:var(--cr-olive);">${i.full_bn}</span>${generateNamesPreview(i)}</td><td><span class="badge bg-dark">${i.ta}</span><br><small class="fw-bold text-muted">${i.pt}</small></td><td class="fw-bold">${i.memo||'-'}${fileIco}</td><td><small>${i.sd||'-'}</small></td><td><small>${i.rd||'-'}</small></td><td><span class="badge bg-light text-dark border"><i class="fa fa-user me-1"></i> ${i.creator}</span></td><td>${sBadge}</td><td><div class="btn-group"><button class="btn btn-sm btn-light border" onclick="openModal('permits',${i.id})"><i class="fa fa-edit text-primary"></i></button><button class="btn btn-sm btn-light border" onclick="deleteRec('perm',${i.id})"><i class="fa fa-trash text-danger"></i></button></div></td></tr>`;
+                pb.innerHTML += `<tr><td><span class="badge bg-secondary shadow-sm mb-1">${i.ref}</span><br><strong class="text-primary small">${i.ofp||'-'}</strong></td><td class="text-start"><strong style="color:var(--cr-olive);">${i.full_bn}</strong>${generateNamesPreview(i)}</td><td><span class="badge bg-dark">${i.ta}</span><br><small class="fw-bold text-muted">${i.pt}</small></td><td class="fw-bold">${i.memo||'-'}${fileIco}</td><td><small>${i.sd||'-'}</small></td><td><small>${i.rd||'-'}</small></td><td><span class="badge bg-light text-dark border"><i class="fa fa-user me-1"></i> ${i.creator}</span></td><td>${sBadge}</td><td><div class="btn-group"><button class="btn btn-sm btn-light border" onclick="openModal('permits',${i.id})"><i class="fa fa-edit text-primary"></i></button><button class="btn btn-sm btn-light border" onclick="deleteRec('perm',${i.id})"><i class="fa fa-trash text-danger"></i></button></div></td></tr>`;
             });
             renderPagination(fPerm.length, currPagePerm, 'permits');
             renderUsers();
@@ -392,7 +422,7 @@
 
         function deleteRec(t, id) { if(!confirm("حذف؟")) return; if(t==='auth') authData = authData.filter(x=>x.id!=id); else permData = permData.filter(x=>x.id!=id); saveToStorage(); render(); }
         function openFile(b64) { let win = window.open(); win.document.write(`<iframe src="${b64}" frameborder="0" style="border:0; top:0; left:0; bottom:0; right:0; width:100%; height:100%;" allowfullscreen></iframe>`); }
-        function clearFilters(t) { if(t==='auth'){ ['f-auth-bn','f-auth-list','f-auth-from','f-auth-to','f-auth-status'].forEach(id=>document.getElementById(id).value=''); currPageAuth=1; } else { ['f-perm-bn','f-perm-ofp','f-perm-list','f-perm-from','f-perm-to'].forEach(id=>document.getElementById(id).value=''); currPagePerm=1; } render(); }
+        function clearFilters(t) { if(t==='auth'){ ['filter-auth-bn','filter-auth-list','filter-auth-from','filter-auth-to','filter-auth-status'].forEach(id=>document.getElementById(id).value=''); currPageAuth=1; } else { ['filter-perm-bn','filter-perm-ofp','filter-perm-list','filter-perm-from','filter-perm-to'].forEach(id=>document.getElementById(id).value=''); currPagePerm=1; } render(); }
 
         function renderUsers() {
             const utb = document.getElementById('utb'); utb.innerHTML = '';
