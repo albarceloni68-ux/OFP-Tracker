@@ -49,7 +49,7 @@
 
         /* Notifications */
         .notification-dropdown { min-width: 300px; max-height: 400px; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 1px solid #eee; }
-        .notif-item { padding: 10px 15px; border-bottom: 1px solid #eee; font-size: 0.85rem; }
+        .notif-item { padding: 10px 15px; border-bottom: 1px solid #eee; font-size: 0.85rem; text-align: right; }
         .notif-item:hover { background-color: #f8f9fa; }
 
         /* Footer */
@@ -89,11 +89,11 @@
                     <button class="btn btn-sm btn-outline-secondary fw-bold ms-3" onclick="toggleLanguage()">EN / AR</button>
                     <!-- الإشعارات -->
                     <div class="dropdown">
-                        <button class="btn btn-light position-relative border" id="bell-btn" data-bs-toggle="dropdown" aria-expanded="false" onclick="markNotificationsAsRead()">
+                        <button class="btn btn-light position-relative border" data-bs-toggle="dropdown" aria-expanded="false" onclick="markNotificationsAsRead()">
                             <i class="fa fa-bell text-warning fs-5"></i>
                             <span id="notif-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none">0</span>
                         </button>
-                        <ul id="notif-list" class="dropdown-menu notification-dropdown text-end p-0">
+                        <ul id="notif-list" class="dropdown-menu notification-dropdown p-0">
                             <li class="p-3 text-center text-muted small fw-bold">لا توجد تصاريح قريبة الانتهاء</li>
                         </ul>
                     </div>
@@ -145,7 +145,7 @@
                             <tbody id="perm-body"></tbody>
                         </table>
                         <nav class="mt-3 d-flex justify-content-between align-items-center">
-                            <button class="btn btn-success btn-sm shadow-sm" onclick="exportData('permits')"><i class="fa fa-file-excel"></i> تصدير</button>
+                            <button class="btn btn-success btn-sm shadow-sm" onclick="exportData('perm')"><i class="fa fa-file-excel"></i> تصدير</button>
                             <ul class="pagination pagination-sm mb-0" id="perm-pagination"></ul>
                         </nav>
                     </div>
@@ -155,7 +155,7 @@
                 <div id="users-section" style="display: none;">
                     <h3 class="fw-bold mb-4">إدارة الحسابات</h3>
                     <div class="custom-card">
-                        <div class="row g-2 mb-4">
+                        <div class="row g-2 mb-4 bg-light p-3 rounded border">
                             <input type="hidden" id="edit-user-idx" value="-1">
                             <div class="col-md-4"><label class="small fw-bold">اسم المستخدم</label><input id="nu" class="form-control"></div>
                             <div class="col-md-4"><label class="small fw-bold">كلمة المرور</label><input id="np" class="form-control"></div>
@@ -191,7 +191,7 @@
                         <div class="col-md-3"><label class="fw-bold small">إرسال</label><input type="date" id="m-sd" class="form-control"></div>
                         <div class="col-md-3"><label class="fw-bold small">استلام</label><input type="date" id="m-rd" class="form-control"></div>
                         <div class="col-md-3"><label class="fw-bold small">رقم المذكرة</label><input type="text" id="m-memo" class="form-control"></div>
-                        <div class="col-md-3"><label class="fw-bold small">مرفق (اختياري)</label><input type="file" id="m-file" class="form-control"></div>
+                        <div class="col-md-3"><label class="fw-bold small">مرفق (اختياري)</label><input type="file" id="m-file" class="form-control" accept=".pdf, image/*"></div>
                         <div class="col-12 mt-4"><div class="alert alert-secondary border small text-center fw-bold">انسخ القوائم من الوورد والصقها مباشرة هنا</div></div>
                         <div class="col-md-3"><label class="fw-bold small">العجلات</label><textarea id="m-w" class="form-control" rows="4"></textarea></div>
                         <div class="col-md-3"><label class="fw-bold small">الأجانب</label><textarea id="m-e" class="form-control" rows="4"></textarea></div>
@@ -204,7 +204,6 @@
         </div>
     </div>
 
-    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         let authData = JSON.parse(localStorage.getItem('CR_AUTH')) || [];
@@ -222,7 +221,6 @@
                 localStorage.setItem('CR_PERM', JSON.stringify(permData)); 
                 localStorage.setItem('CR_USERS', JSON.stringify(users)); 
                 localStorage.setItem('CR_NOTIFS', JSON.stringify(readNotifs)); 
-                checkNotifications(); 
             } catch(e) { alert("⚠️ الذاكرة ممتلئة! يرجى حذف بعض الملفات المرفقة."); }
         }
 
@@ -285,21 +283,30 @@
             };
 
             const stats = `${entry.e.length} أجانب - ${entry.w.length} عجلات - ${entry.l.length} عراقيين`;
+
             if(type === 'auth') {
-                entry.full_bn = `TEMP - ${entry.bn_orig} - ${entry.pt} - ${stats} وفقط`; entry.status = entry.rd ? 'Done' : 'Pending';
-                if(id) { authData[authData.findIndex(x=>x.id == id)] = entry; let pIdx = permData.findIndex(p => p.ref === entry.ref);
-                    if(pIdx !== -1) { permData[pIdx].pt=entry.pt; permData[pIdx].ta=entry.ta; permData[pIdx].w=entry.w; permData[pIdx].e=entry.e; permData[pIdx].l=entry.l; permData[pIdx].wp=entry.wp; permData[pIdx].full_bn = `ISCO - ${permData[pIdx].bn_orig} - ${entry.pt} - ${stats} وفقط`; }
+                entry.full_bn = `TEMP - ${entry.bn_orig} - ${entry.pt} - ${stats} وفقط`; 
+                entry.status = entry.rd ? 'Done' : 'Pending';
+
+                if(id) { 
+                    authData[authData.findIndex(x=>x.id == id)] = entry; 
+                    let pIdx = permData.findIndex(p => p.ref === entry.ref);
+                    if(pIdx !== -1) { permData[pIdx].pt=entry.pt; permData[pIdx].ta=entry.ta; permData[pIdx].w=entry.w; permData[pIdx].e=entry.e; permData[pIdx].l=entry.l; permData[pIdx].wp=entry.wp; permData[pIdx].full_bn = `ISCO - ${permData[pIdx].bn_orig||''} - ${entry.pt} - ${stats} وفقط`; }
                 } else authData.push(entry);
 
-                if(entry.status === 'Done' && !permData.find(p=>p.ref === entry.ref)) { let copy = JSON.parse(JSON.stringify(entry)); copy.id = Date.now()+1; copy.bn_orig = ""; copy.full_bn = ""; copy.ofp = ""; copy.sd = ""; copy.rd = ""; copy.status = "Pending"; permData.push(copy); }
+                if(entry.status === 'Done' && !permData.find(p=>p.ref === entry.ref)) { 
+                    let copy = JSON.parse(JSON.stringify(entry)); 
+                    copy.id = Date.now()+1; copy.bn_orig = ""; copy.full_bn = ""; copy.ofp = ""; copy.sd = ""; copy.rd = ""; copy.status = "Pending"; 
+                    permData.push(copy); 
+                }
             } else {
-                entry.status = entry.rd ? 'Completed' : 'Pending'; entry.full_bn = `ISCO - ${entry.bn_orig} - ${entry.pt} - ${stats} وفقط`;
+                entry.status = entry.rd ? 'Completed' : 'Pending'; 
+                entry.full_bn = `ISCO - ${entry.bn_orig} - ${entry.pt} - ${stats} وفقط`;
                 permData[permData.findIndex(x=>x.id == id)] = entry;
             }
-            saveToStorage(); render(); modal.hide();
+            saveToStorage(); render(); checkNotifications(); modal.hide();
         }
 
-        // هندسة الإشعارات المستقلة لكل يوزر
         function checkNotifications() {
             if(!currentUser) return;
             let alerts = []; let unreadCount = 0; const today = new Date();
@@ -322,30 +329,28 @@
             } else { b.classList.add('d-none'); l.innerHTML = `<li class="p-3 text-center text-muted small fw-bold">لا توجد إشعارات</li>`; }
         }
 
-        // إخفاء الإشعارات فور الضغط عليها
+        // إخفاء الإشعار مباشرة عند الضغط عليه
         function markNotificationsAsRead() {
             if(!currentUser) return;
             const today = new Date();
             permData.forEach(p => {
                 if(p.rd) {
-                    const diffDays = Math.ceil(Math.abs(today - new Date(p.rd)) / (1000 * 60 * 60 * 24));
+                    const diffDays = Math.floor(Math.abs(today - new Date(p.rd)) / (1000 * 60 * 60 * 24));
                     if((21 - diffDays) <= 10 && (21 - diffDays) >= 0) {
                         if(!readNotifs[currentUser.u].includes(p.id)) readNotifs[currentUser.u].push(p.id);
                     }
                 }
             });
-            // إخفاء العداد الأحمر فوراً عبر الـ DOM
             document.getElementById('notif-count').classList.add('d-none');
-            // حفظ التغيير في الذاكرة
-            localStorage.setItem('CR_NOTIFS', JSON.stringify(readNotifs));
+            saveToStorage();
         }
 
         function generateNamesPreview(i) {
             let html = '';
             if(i.w.length>0||i.e.length>0||i.l.length>0||i.wp.length>0) {
                 html += `<div class="names-preview">`;
-                if(i.w.length>0) html+=`<strong>🚗 العجلات:</strong> ${i.w.join('، ')}<br>`; if(i.e.length>0) html+=`<strong>👤 الأجانب:</strong> ${i.e.join('، ')}<br>`;
-                if(i.l.length>0) html+=`<strong>👨🏽 العراقيين:</strong> ${i.l.join('، ')}<br>`; if(i.wp.length>0) html+=`<strong>🔫 الأسلحة:</strong> ${i.wp.join('، ')}<br>`;
+                if(i.w.length>0) html+=`<strong>🚗 عجلات:</strong> ${i.w.join('، ')}<br>`; if(i.e.length>0) html+=`<strong>👤 أجانب:</strong> ${i.e.join('، ')}<br>`;
+                if(i.l.length>0) html+=`<strong>👨🏽 عراقيين:</strong> ${i.l.join('، ')}<br>`; if(i.wp.length>0) html+=`<strong>🔫 أسلحة:</strong> ${i.wp.join('، ')}<br>`;
                 html += `</div>`;
             } return html;
         }
@@ -412,7 +417,7 @@
         }
         function editUser(i) { document.getElementById('nu').value=users[i].u; document.getElementById('np').value=users[i].p; document.getElementById('edit-user-idx').value=i; document.getElementById('btn-save-user').innerText="تحديث"; }
         function handleUser() { const u=document.getElementById('nu').value, p=document.getElementById('np').value, idx=parseInt(document.getElementById('edit-user-idx').value); if(!u||!p) return; if(idx!==-1){ users[idx].u=u; users[idx].p=p; document.getElementById('edit-user-idx').value=-1; document.getElementById('btn-save-user').innerText="إضافة"; } else users.push({u,p,r:'user'}); document.getElementById('nu').value=''; document.getElementById('np').value=''; saveToStorage(); render(); }
-        function exportData(t) { const d = t==='auth'?authData:permData; const ws = XLSX.utils.json_to_sheet(d.map(i=>({ Ref: i.ref, Book_No: i.bn_orig, Full_Name: i.full_bn, Authority: i.ta, Type: i.pt, Memo: i.memo||'', OFP: i.ofp||'', Sent: i.sd||'', Received: i.rd||'', Status: i.status, Creator: i.creator, Wheels: i.w.join(' | '), Expats: i.e.join(' | '), Locals: i.l.join(' | '), Weapons: i.wp.join(' | ') }))); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Data"); XLSX.writeFile(wb, `CR_${t}.xlsx`); }
+        function exportData(t) { const d = t==='auth'?authData:permData; const ws = XLSX.utils.json_to_sheet(d.map(i=>({ Ref: i.ref, Book_No: i.bn_orig, Full_Name: i.full_bn, Authority: i.ta, Type: i.pt, Memo: i.memo||'', OFP: i.ofp||'', Sent: i.sd||'', Received: i.rd||'', Status: i.status, Creator: i.creator, Wheels: i.w.join(' | '), Expats: i.e.join(' | '), Locals: i.l.join(' | '), Weapons: i.wp.join(' | ') }))); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Data"); XLSX.writeFile(wb, `ControlRisks_${t}.xlsx`); }
         function toggleLanguage() { lang = lang==='ar'?'en':'ar'; document.getElementById('html-tag').dir = lang==='en'?'ltr':'rtl'; document.body.className = lang==='en'?'ltr-mode text-start':'rtl-mode text-start'; }
     </script>
 </body>
