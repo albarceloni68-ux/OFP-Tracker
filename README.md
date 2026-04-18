@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Control Risks | OFP Tracker PRO</title>
-    <!-- Bootstrap & Fonts -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.rtl.min.css" id="bootstrap-rtl">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -63,7 +62,7 @@
         <div class="login-card shadow-lg">
             <h2>CONTROL RISKS</h2>
             <p class="text-muted mb-4 fw-bold">OFP Application Tracker</p>
-            <div id="login-error" class="alert alert-danger p-2 small fw-bold" style="display: none;"><i class="fa fa-exclamation-circle"></i> اليوزر أو الرمز خطأ.</div>
+            <div id="login-error" class="alert alert-danger p-2 small fw-bold d-none"><i class="fa fa-exclamation-circle"></i> اليوزر أو الرمز خطأ.</div>
             <div class="mb-3 text-start"><label class="fw-bold small">اسم المستخدم</label><input type="text" id="userInput" class="form-control form-control-lg"></div>
             <div class="mb-4 text-start"><label class="fw-bold small">كلمة المرور</label><input type="password" id="passInput" class="form-control form-control-lg" onkeypress="if(event.key === 'Enter') loginSystem()"></div>
             <button onclick="loginSystem()" class="btn btn-cr w-100 p-3 fs-5">دخول</button>
@@ -89,12 +88,12 @@
                     <button class="btn btn-sm btn-outline-secondary fw-bold ms-3" onclick="toggleLanguage()">EN / AR</button>
                     <!-- الإشعارات -->
                     <div class="dropdown">
-                        <button class="btn btn-light position-relative border" data-bs-toggle="dropdown" aria-expanded="false" onclick="openNotifications()">
+                        <button class="btn btn-light position-relative border" id="bell-btn" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="fa fa-bell text-warning fs-5"></i>
-                            <span id="notif-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="display: none;">0</span>
+                            <span id="notif-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none">0</span>
                         </button>
-                        <ul id="notif-list" class="dropdown-menu notification-dropdown text-end p-0">
-                            <li class="p-3 text-center text-muted small fw-bold">لا توجد تصاريح قريبة الانتهاء</li>
+                        <ul id="notif-list" class="dropdown-menu notification-dropdown p-0">
+                            <!-- سيتم حقن الإشعارات هنا -->
                         </ul>
                     </div>
                 </div>
@@ -204,17 +203,51 @@
         </div>
     </div>
 
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         let authData = JSON.parse(localStorage.getItem('CR_AUTH')) || [];
         let permData = JSON.parse(localStorage.getItem('CR_PERM')) || [];
         let users = JSON.parse(localStorage.getItem('CR_USERS')) || [{u:'admin', p:'1234', r:'admin'}];
         let readNotifs = JSON.parse(localStorage.getItem('CR_NOTIFS')) || {};
-        
         let currentUser = null; let lang = 'ar';
         const modal = new bootstrap.Modal(document.getElementById('mainModal'));
         
         let currPageAuth = 1; let currPagePerm = 1; const rowsPerPage = 15;
+
+        // دالة قوية للتأكد من مسح الإشعارات فور النقر على زر الجرس (Event Listener مستقل)
+        document.addEventListener('DOMContentLoaded', () => {
+            const bellBtn = document.getElementById('bell-btn');
+            if(bellBtn) {
+                bellBtn.addEventListener('click', function() {
+                    if(!currentUser) return;
+                    
+                    // 1. إخفاء العداد فوراً وبشكل حاسم من واجهة المستخدم
+                    document.getElementById('notif-count').classList.add('d-none');
+                    
+                    // 2. تحديث قاعدة بيانات الإشعارات للمستخدم الحالي
+                    const today = new Date();
+                    today.setHours(0,0,0,0);
+
+                    permData.forEach(p => {
+                        if(p.rd) {
+                            const rDate = new Date(p.rd);
+                            const diffDays = Math.floor((today.getTime() - rDate.getTime()) / (1000 * 3600 * 24));
+                            const daysLeft = 21 - diffDays;
+
+                            if(daysLeft <= 10 && daysLeft >= 0) {
+                                if(!readNotifs[currentUser.u].includes(p.id)) {
+                                    readNotifs[currentUser.u].push(p.id);
+                                }
+                            }
+                        }
+                    });
+                    
+                    // 3. حفظ الذاكرة بصمت
+                    localStorage.setItem('CR_NOTIFS', JSON.stringify(readNotifs));
+                });
+            }
+        });
 
         function saveToStorage() {
             try { 
@@ -235,9 +268,10 @@
                 document.getElementById('user-display').innerText = f.u; 
                 if(f.r === 'admin') document.getElementById('admin-menu').style.display = 'block';
                 if(!readNotifs[currentUser.u]) readNotifs[currentUser.u] = [];
-                render(); 
-                checkNotifications();
-            } else document.getElementById('login-error').style.display = 'block';
+                render(); checkNotifications();
+            } else {
+                document.getElementById('login-error').classList.remove('d-none');
+            }
         }
 
         function showTab(t) {
@@ -286,58 +320,64 @@
 
             const stats = `${entry.e.length} أجانب - ${entry.w.length} عجلات - ${entry.l.length} عراقيين`;
             if(type === 'auth') {
-                entry.full_bn = `TEMP - ${entry.bn_orig} - ${entry.pt} - ${stats}`; entry.status = entry.rd ? 'Done' : 'Pending';
+                entry.full_bn = `TEMP - ${entry.bn_orig} - ${entry.pt} - ${stats} وفقط`; entry.status = entry.rd ? 'Done' : 'Pending';
                 if(id) { authData[authData.findIndex(x=>x.id == id)] = entry; let pIdx = permData.findIndex(p => p.ref === entry.ref);
-                    if(pIdx !== -1) { permData[pIdx].pt=entry.pt; permData[pIdx].ta=entry.ta; permData[pIdx].w=entry.w; permData[pIdx].e=entry.e; permData[pIdx].l=entry.l; permData[pIdx].wp=entry.wp; permData[pIdx].full_bn = `ISCO - ${permData[pIdx].bn_orig} - ${entry.pt} - ${stats}`; }
+                    if(pIdx !== -1) { permData[pIdx].pt=entry.pt; permData[pIdx].ta=entry.ta; permData[pIdx].w=entry.w; permData[pIdx].e=entry.e; permData[pIdx].l=entry.l; permData[pIdx].wp=entry.wp; permData[pIdx].full_bn = `ISCO - ${permData[pIdx].bn_orig||""} - ${entry.pt} - ${stats} وفقط`; }
                 } else authData.push(entry);
 
                 if(entry.status === 'Done' && !permData.find(p=>p.ref === entry.ref)) { let copy = JSON.parse(JSON.stringify(entry)); copy.id = Date.now()+1; copy.bn_orig = ""; copy.full_bn = ""; copy.ofp = ""; copy.sd = ""; copy.rd = ""; copy.status = "Pending"; permData.push(copy); }
             } else {
-                entry.status = entry.rd ? 'Completed' : 'Pending'; entry.full_bn = `ISCO - ${entry.bn_orig} - ${entry.pt} - ${stats}`;
+                entry.status = entry.rd ? 'Completed' : 'Pending'; entry.full_bn = `ISCO - ${entry.bn_orig} - ${entry.pt} - ${stats} وفقط`;
                 permData[permData.findIndex(x=>x.id == id)] = entry;
             }
             saveToStorage(); render(); checkNotifications(); modal.hide();
         }
 
+        // بناء وعرض الإشعارات بدقة
         function checkNotifications() {
             if(!currentUser) return;
-            let alerts = []; let unreadCount = 0; const today = new Date();
+            if(!readNotifs[currentUser.u]) readNotifs[currentUser.u] = [];
+
+            let alerts = []; let unreadCount = 0; 
+            const today = new Date();
+            today.setHours(0,0,0,0);
             
             permData.forEach(p => {
                 if(p.rd) {
-                    const rDate = new Date(p.rd); const diffTime = Math.abs(today - rDate); const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    const rDate = new Date(p.rd); 
+                    const diffTime = today.getTime() - rDate.getTime(); 
+                    const diffDays = Math.floor(diffTime / (1000 * 3600 * 24));
                     const daysLeft = 21 - diffDays;
+                    
                     if(daysLeft <= 10 && daysLeft >= 0) {
                         alerts.push({id: p.id, bn: p.full_bn, left: daysLeft});
-                        if(!readNotifs[currentUser.u].includes(p.id)) unreadCount++;
+                        if(!readNotifs[currentUser.u].includes(p.id)) {
+                            unreadCount++;
+                        }
                     }
                 }
             });
-            const b = document.getElementById('notif-count'); const l = document.getElementById('notif-list');
-            if(alerts.length > 0) {
-                if(unreadCount > 0) { b.style.display = 'inline-block'; b.innerText = unreadCount; } else { b.style.display = 'none'; }
-                l.innerHTML = '';
-                alerts.forEach(a => l.innerHTML += `<li class="notif-item"><i class="fa fa-exclamation-triangle text-danger me-2"></i><strong>${a.bn}</strong><br><small class="text-muted">ينتهي بعد: <span class="text-danger fw-bold">${a.left} أيام</span></small></li>`);
-            } else { b.style.display = 'none'; l.innerHTML = `<li class="p-3 text-center text-muted small fw-bold">لا توجد إشعارات</li>`; }
-        }
 
-        // دالة تفتح القائمة وتخفي الإشعار فوراً وتسجله بالذاكرة
-        function openNotifications() {
-            if(!currentUser) return;
+            const badge = document.getElementById('notif-count'); 
+            const list = document.getElementById('notif-list');
             
-            // إخفاء العداد الأحمر فوراً عبر Style
-            document.getElementById('notif-count').style.display = 'none';
-            
-            const today = new Date();
-            permData.forEach(p => {
-                if(p.rd) {
-                    const diffDays = Math.ceil(Math.abs(today - new Date(p.rd)) / (1000 * 60 * 60 * 24));
-                    if((21 - diffDays) <= 10 && (21 - diffDays) >= 0) {
-                        if(!readNotifs[currentUser.u].includes(p.id)) readNotifs[currentUser.u].push(p.id);
-                    }
+            list.innerHTML = ''; // مسح القائمة القديمة
+
+            if(alerts.length > 0) {
+                if(unreadCount > 0) { 
+                    badge.classList.remove('d-none'); 
+                    badge.innerText = unreadCount; 
+                } else { 
+                    badge.classList.add('d-none'); 
                 }
-            });
-            saveToStorage();
+                
+                alerts.forEach(a => {
+                    list.innerHTML += `<li class="notif-item text-end"><i class="fa fa-exclamation-triangle text-danger me-2"></i><strong class="text-dark">${a.bn}</strong><br><small class="text-muted">ينتهي بعد: <span class="text-danger fw-bold">${a.left} أيام</span></small></li>`;
+                });
+            } else { 
+                badge.classList.add('d-none'); 
+                list.innerHTML = `<li class="p-3 text-center text-muted small fw-bold">لا توجد إشعارات</li>`; 
+            }
         }
 
         function generateNamesPreview(i) {
