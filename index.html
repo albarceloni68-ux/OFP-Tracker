@@ -13,8 +13,8 @@
 
     <style>
         :root { 
-            --cr-primary: #002A54; 
-            --cr-primary-light: #184275; 
+            --cr-blue: #002A54; 
+            --cr-blue-light: #184275; 
             --cr-dark: #1a1a1a; 
             --cr-light: #f4f7f1; 
             --cr-olive: #3D4928;
@@ -23,29 +23,29 @@
         body { font-family: 'Cairo', sans-serif; background-color: var(--cr-light); margin: 0; display: flex; flex-direction: column; min-height: 100vh; }
         
         #sidebar { width: 260px; background-color: var(--cr-dark); color: white; position: fixed; height: 100%; z-index: 1000; overflow-y: auto; transition: 0.3s; }
-        .sidebar-header { background: white; padding: 20px 15px; text-align: center; border-bottom: 3px solid var(--cr-primary); }
+        .sidebar-header { background: white; padding: 20px 15px; text-align: center; border-bottom: 3px solid var(--cr-blue); }
         .sidebar-header img { width: 100%; max-width: 180px; }
         
         #sidebar ul { list-style: none; padding: 0; margin-top: 10px; }
         #sidebar ul li a { padding: 15px 20px; display: block; color: #cbd5e0; text-decoration: none; border-bottom: 1px solid #2d3748; cursor: pointer; transition: 0.3s; border-right: 4px solid transparent; }
-        #sidebar ul li a:hover, #sidebar ul li a.active { background: var(--cr-primary-light); color: white; border-right: 4px solid white; padding-right: 25px; font-weight: bold; }
+        #sidebar ul li a:hover, #sidebar ul li a.active { background: var(--cr-blue-light); color: white; border-right: 4px solid white; padding-right: 25px; font-weight: bold; }
         
         .sub-menu { display: none; background-color: #0a0a0a; }
         .sub-menu a { padding: 10px 30px !important; font-size: 0.9rem; border-bottom: none !important; }
-        .sub-menu a:hover, .sub-menu a.active-sub { color: white !important; padding-right: 35px !important; border-right: 4px solid var(--cr-primary) !important; background: transparent !important; }
+        .sub-menu a:hover, .sub-menu a.active-sub { color: white !important; padding-right: 35px !important; border-right: 4px solid var(--cr-blue) !important; background: transparent !important; }
 
         /* Main Content */
         .content { margin-right: 260px; flex: 1; transition: 0.3s; display: flex; flex-direction: column; }
         .top-navbar { background: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
         
         /* Buttons */
-        .btn-cr { background-color: var(--cr-primary); color: white; border: none; font-weight: bold; transition: 0.3s; }
-        .btn-cr:hover { background-color: var(--cr-primary-light); color: white; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+        .btn-cr { background-color: var(--cr-blue); color: white; border: none; font-weight: bold; transition: 0.3s; }
+        .btn-cr:hover { background-color: var(--cr-blue-light); color: white; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
         
         .custom-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); margin-bottom: 20px; }
         
         /* Login Page */
-        #login-page { height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--cr-dark) 0%, var(--cr-primary) 100%); position: fixed; width: 100%; z-index: 2000; top: 0; left: 0; }
+        #login-page { height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--cr-dark) 0%, var(--cr-blue) 100%); position: fixed; width: 100%; z-index: 2000; top: 0; left: 0; }
         .login-card { background: white; padding: 40px; border-radius: 20px; width: 100%; max-width: 420px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
         
         /* Filters */
@@ -54,15 +54,15 @@
         
         /* Previews & Badges */
         .names-preview { font-size: 0.8rem; background: #fafafa; border: 1px solid #eee; padding: 10px; border-radius: 6px; margin-top: 8px; max-height: 100px; overflow-y: auto; text-align: start; line-height: 1.6;}
-        .names-preview strong { color: var(--cr-primary); }
-        .ref-badge { font-size: 0.75rem; padding: 3px 8px; border-radius: 4px; background: #eef2f7; color: var(--cr-primary); border: 1px solid var(--cr-primary); font-weight: bold; }
+        .names-preview strong { color: var(--cr-blue); }
+        .ref-badge { font-size: 0.75rem; padding: 3px 8px; border-radius: 4px; background: #eef2f7; color: var(--cr-blue); border: 1px solid var(--cr-blue); font-weight: bold; }
         
         /* Pagination & Notifications */
-        .pagination .page-link { color: var(--cr-primary); font-weight: bold; cursor: pointer; }
-        .pagination .page-item.active .page-link { background-color: var(--cr-primary); border-color: var(--cr-primary); color: white; }
+        .pagination .page-link { color: var(--cr-blue); font-weight: bold; cursor: pointer; }
+        .pagination .page-item.active .page-link { background-color: var(--cr-blue); border-color: var(--cr-blue); color: white; }
         .notification-dropdown { min-width: 320px; max-height: 400px; overflow-y: auto; }
         
-        .cr-footer { background-color: var(--cr-primary); color: white; padding: 15px; text-align: center; margin-top: auto; font-size: 0.85rem; }
+        .cr-footer { background-color: var(--cr-blue); color: white; padding: 15px; text-align: center; margin-top: auto; font-size: 0.85rem; }
         
         /* Language Adjustments */
         .ltr-mode .content { margin-right: 0; margin-left: 260px; }
@@ -79,7 +79,7 @@
             <img src="https://parisarbitrationweek.com/wp-content/uploads/gravity_forms/5-8c91b4cf34801a0f50f49fc1e3b236a3/2024/02/control-risks-logo-dark-blue-rgb.jpg" alt="Logo" style="width: 80%; max-width: 250px; margin-bottom: 20px;">
             <p class="text-muted mb-4 fw-bold">OFP Application Tracker</p>
             
-            <div id="login-error" class="alert alert-danger p-2 small fw-bold d-none">
+            <div id="login-error" class="alert alert-danger p-2 small fw-bold" style="display: none;">
                 <i class="fa fa-exclamation-circle"></i> اسم المستخدم أو كلمة المرور غير صحيحة.
             </div>
 
@@ -116,7 +116,7 @@
                         <li><a onclick="showMasterTab('w')" id="sub-w"><i class="fa fa-car ms-2"></i> العجلات</a></li>
                     </ul>
                 </li>
-                <li id="admin-menu" class="d-none"><a onclick="showTab('users')" id="link-users"><i class="fa fa-users-gear ms-2"></i> إدارة الحسابات</a></li>
+                <li id="admin-menu" style="display: none;"><a onclick="showTab('users')" id="link-users"><i class="fa fa-users-gear ms-2"></i> إدارة الحسابات</a></li>
                 <li><a onclick="logout()"><i class="fa fa-power-off ms-2"></i> تسجيل الخروج</a></li>
             </ul>
         </nav>
@@ -136,7 +136,7 @@
                         </ul>
                     </div>
                 </div>
-                <div><span class="text-muted small">مرحباً:</span> <strong id="user-display" style="color: var(--cr-primary);"></strong> <i class="fa fa-user-circle ms-1"></i></div>
+                <div><span class="text-muted small">مرحباً:</span> <strong id="user-display" style="color: var(--cr-blue);"></strong> <i class="fa fa-user-circle ms-1"></i></div>
             </header>
 
             <div class="p-4" style="flex: 1;">
@@ -144,19 +144,19 @@
                 <!-- قسم الهيئات -->
                 <div id="auth-section">
                     <div class="d-flex justify-content-between mb-3 align-items-center">
-                        <h3 class="fw-bold mb-0 text-dark">سجل الطلبات للهيئات</h3>
+                        <h3 class="fw-bold mb-0">سجل الطلبات للهيئات</h3>
                         <button class="btn btn-cr shadow-sm px-4 py-2" onclick="openModal('auth')"><i class="fa fa-plus me-1"></i> إنشاء طلب جديد</button>
                     </div>
                     
                     <div class="filter-box">
                         <div class="row g-3 align-items-end">
                             <div class="col-md-2"><label class="filter-label">رقم الكتاب</label><input type="text" id="f-auth-booknum" class="form-control" onkeyup="currPageAuth=1; renderTables()"></div>
-                            <div class="col-md-3"><label class="filter-label">البحث في الأسماء (أجانب/عراقيين/عجلات/أسلحة)</label><input type="text" id="f-auth-list" class="form-control" onkeyup="currPageAuth=1; renderTables()"></div>
+                            <div class="col-md-3"><label class="filter-label">البحث في الأسماء</label><input type="text" id="f-auth-list" class="form-control" onkeyup="currPageAuth=1; renderTables()"></div>
                             <div class="col-md-2"><label class="filter-label">رقم المذكرة</label><input type="text" id="f-auth-memo" class="form-control" onkeyup="currPageAuth=1; renderTables()"></div>
                             <div class="col-md-2"><label class="filter-label">من تاريخ</label><input type="date" id="f-auth-from" class="form-control" onchange="currPageAuth=1; renderTables()"></div>
                             <div class="col-md-2"><label class="filter-label">إلى تاريخ</label><input type="date" id="f-auth-to" class="form-control" onchange="currPageAuth=1; renderTables()"></div>
                             <div class="col-md-1"><label class="filter-label">الحالة</label><select id="f-auth-status" class="form-select" onchange="currPageAuth=1; renderTables()"><option value="">الكل</option><option value="Pending">Pending</option><option value="Done">Completed</option></select></div>
-                            <div class="col-12 text-end"><button class="btn btn-sm btn-outline-secondary px-4" onclick="clearFilters('auth')"><i class="fa fa-eraser me-1"></i> مسح הפלتر</button></div>
+                            <div class="col-12 text-end"><button class="btn btn-sm btn-outline-secondary px-4" onclick="clearFilters('auth')"><i class="fa fa-eraser me-1"></i> مسح الفلاتر</button></div>
                         </div>
                     </div>
 
@@ -183,7 +183,7 @@
                 <!-- قسم التصاريح -->
                 <div id="permits-section" style="display: none;">
                     <div class="d-flex justify-content-between mb-3 align-items-center">
-                        <h3 class="fw-bold mb-0" style="color: var(--cr-primary);">سجل التصاريح المستلمة</h3>
+                        <h3 class="fw-bold mb-0" style="color: var(--cr-blue);">سجل التصاريح المستلمة</h3>
                     </div>
                     
                     <div class="filter-box">
@@ -265,21 +265,26 @@
                             <div class="col-md-4 d-flex align-items-end"><button id="btn-save-user" class="btn btn-cr w-100 fw-bold" onclick="handleUserAccount()">إضافة حساب</button></div>
                         </div>
                         <table class="table table-striped border text-center">
-                            <thead class="table-dark"><tr><th>المستخدم</th><th>الباسورد</th><th>الرتبة</th><th>الإجراءات</th></tr></thead>
+                            <thead class="table-dark"><tr><th>المستخدم</th><th>كلمة المرور</th><th>الرتبة</th><th>الإجراءات</th></tr></thead>
                             <tbody id="utb"></tbody>
                         </table>
                     </div>
                 </div>
             </div>
-            <footer class="cr-footer">&copy; 2026 Control Risks - OFP Application Tracker. All Rights Reserved.</footer>
+
+            <!-- Footer updated to 2026 -->
+            <footer class="cr-footer">
+                &copy; 2026 Control Risks - OFP Application Tracker. All Rights Reserved.
+            </footer>
         </div>
     </div>
 
-    <!-- Modal Form (Auth & Permits) -->
+    <!-- Modals -->
+    <!-- Main Modal (Auth/Permits) -->
     <div class="modal fade" id="mainModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-xl">
             <div class="modal-content border-0 shadow-lg text-start">
-                <div class="modal-header text-white" style="background-color: var(--cr-primary);"><h5 class="modal-title fw-bold">بيانات الطلب</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+                <div class="modal-header text-white" style="background-color: var(--cr-blue);"><h5 class="modal-title fw-bold">بيانات الطلب</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
                 <div class="modal-body p-4">
                     <input type="hidden" id="form-type"><input type="hidden" id="edit-id">
                     <div class="row g-3">
@@ -290,7 +295,7 @@
                         <div class="col-md-3"><label class="fw-bold small">تاريخ الإرسال</label><input type="date" id="m-sd" class="form-control"></div>
                         <div class="col-md-3"><label class="fw-bold small">تاريخ الاستلام</label><input type="date" id="m-rd" class="form-control"></div>
                         <div class="col-md-3"><label class="fw-bold small">رقم المذكرة</label><input type="text" id="m-memo" class="form-control"></div>
-                        <div class="col-md-3"><label class="fw-bold small">مرفق المذكرة (PDF/Image)</label><input type="file" id="m-file" class="form-control" accept=".pdf, image/*"></div>
+                        <div class="col-md-3"><label class="fw-bold small">مرفق (PDF/Image)</label><input type="file" id="m-file" class="form-control" accept=".pdf, image/*"></div>
                         <div class="col-12 mt-4"><div class="alert alert-secondary border small text-center fw-bold"><i class="fa fa-info-circle me-1"></i> يمكنك نسخ القوائم من الوورد ولصقها مباشرة في الخانات أدناه (كل اسم في سطر)</div></div>
                         <div class="col-md-3"><label class="fw-bold small text-muted"><i class="fa fa-car"></i> العجلات</label><textarea id="m-w" class="form-control" rows="5"></textarea></div>
                         <div class="col-md-3"><label class="fw-bold small text-muted"><i class="fa fa-user"></i> الأجانب</label><textarea id="m-e" class="form-control" rows="5"></textarea></div>
@@ -307,7 +312,7 @@
     <div class="modal fade" id="addMasterModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content border-0 shadow text-start">
-                <div class="modal-header text-white" style="background: var(--cr-primary);"><h5 class="modal-title fw-bold">إضافة لقاعدة البيانات</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
+                <div class="modal-header text-white" style="background: var(--cr-blue);"><h5 class="modal-title fw-bold">إضافة لقاعدة البيانات</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div>
                 <div class="modal-body">
                     <div class="mb-3"><label class="small fw-bold">النوع</label><select id="master-type-select" class="form-select" disabled><option value="e">أجانب (Expats)</option><option value="l">عراقيين (Locals)</option><option value="w">عجلات (Vehicles)</option></select></div>
                     <div class="mb-3"><label class="small fw-bold">المشروع (Project)</label><select id="master-project" class="form-select"><option value="BGC">BGC</option><option value="ROO">ROO</option><option value="SRC">SRC</option></select></div>
@@ -394,8 +399,11 @@
             ['auth-section', 'permits-section', 'users-section', 'master-section'].forEach(s => document.getElementById(s).classList.add('d-none'));
             document.querySelectorAll('#sidebar a').forEach(a => a.classList.remove('active', 'active-sub'));
             
-            document.getElementById(t + '-section').classList.remove('d-none');
-            document.getElementById('link-' + t).classList.add('active');
+            if(t !== 'master') {
+                document.getElementById(t + '-section').classList.remove('d-none');
+                document.getElementById('link-' + t).classList.add('active');
+                document.getElementById('master-submenu').style.display = 'none';
+            }
         }
 
         function toggleMasterMenu() {
@@ -453,8 +461,7 @@
         
         function openBulkUpdateModal() {
             const checked = document.querySelectorAll('.master-cb:checked'); 
-            if(checked.length === 0) return alert("الرجاء تحديد عنصر واحد على الأقل بوضع علامة صح من الجدول!");
-            
+            if(checked.length === 0) return alert("الرجاء تحديد عنصر واحد على الأقل من الجدول بوضع علامة صح.");
             document.getElementById('selected-count').innerText = checked.length; 
             document.getElementById('bulk-isco').value = ""; document.getElementById('bulk-memo').value = ""; document.getElementById('bulk-ofp').value = ""; document.getElementById('bulk-start').value = ""; document.getElementById('bulk-end').value = "";
             bulkUpdateModalObj.show();
@@ -515,7 +522,7 @@
                 }
                 
                 alerts.forEach(a => {
-                    notifList.innerHTML += `<li class="notif-item text-end"><i class="fa fa-exclamation-triangle text-danger me-2"></i><strong class="text-dark">${a.name}</strong><br><small class="text-muted">OFP: ${a.ofp || 'لا يوجد'} - ينتهي بعد: <span class="text-danger fw-bold">${a.left} أيام</span></small></li>`;
+                    notifList.innerHTML += `<li class="p-2 border-bottom text-end"><i class="fa fa-exclamation-triangle text-danger me-2"></i><strong class="text-dark">${a.name}</strong><br><small class="text-muted">OFP: ${a.ofp || 'لا يوجد'} - ينتهي بعد: <span class="text-danger fw-bold">${a.left} أيام</span></small></li>`;
                 });
             } else { 
                 badgeCount.classList.add('d-none'); 
@@ -540,7 +547,7 @@
             });
         }
 
-        // 6. Auth & Permits Modals
+        // 6. الهيئات والتصاريح (Auth & Permits)
         function openModal(type, id = null) {
             document.getElementById('m-bn').value = ""; document.getElementById('m-pt').value = "مؤقت"; document.getElementById('m-ta').value = "BGC";
             document.getElementById('m-memo').value = ""; document.getElementById('m-ofp').value = ""; document.getElementById('m-sd').value = "";
